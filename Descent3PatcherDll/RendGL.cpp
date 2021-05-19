@@ -246,6 +246,8 @@ int rGL_Init(oeWin32Application* app, renderer_preferred_state* pref_state)
 		rect.top = baseY;
 		rect.right = baseX + mWidth;
 		rect.bottom = baseY + mHeight;
+		if (PatchScreenMode == SCREENMODE_BORDERLESS)
+			rect.right += 1; //This is filthy, but if the window is the size of the screen, it messes up
 	}
 
 	int lwidth = abs(rect.right - rect.left);
@@ -254,12 +256,18 @@ int rGL_Init(oeWin32Application* app, renderer_preferred_state* pref_state)
 	screenWidth = mWidth; screenHeight = mHeight;
 	MoveWindow(*phOpenGLWnd, rect.left, rect.top, lwidth, lheight, TRUE);
 
-	GetWindowRect((HWND)*phOpenGLWnd, &rect);
+	//GetWindowRect((HWND)*phOpenGLWnd, &rect);
 	//width = abs(rect.right - rect.left);
 	//height = abs(rect.bottom - rect.top);
 
 	pOpenGL_state->screen_width = width;
 	pOpenGL_state->screen_height = height;
+
+	/*if (PatchScreenMode == SCREENMODE_BORDERLESS)
+	{
+		rect.right -= 1;
+	}*/
+
 
 	if (!rGL_Setup(*phOpenGLDC))
 	{
