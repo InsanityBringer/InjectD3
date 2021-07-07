@@ -169,6 +169,7 @@ int llsOpenAL::PlaySound2d(play_information* play_info, int sound_index, float v
 
 	bool looped = f_looped || (pSounds[sound_index].flags & SPF_LOOPED) != 0;
 
+	//PutLog(LogLevel::Info, "Initializing 2D source.");
 	InitSource2D(SoundEntries[sound_uid].handle, &pSounds[sound_index], volume);
 	if (looped)
 		alSourcei(SoundEntries[sound_uid].handle, AL_LOOPING, AL_TRUE);
@@ -179,11 +180,13 @@ int llsOpenAL::PlaySound2d(play_information* play_info, int sound_index, float v
 	//Unbind the buffer so I can rewrite it:
 	//TODO: Should each entry in pSound have their own buffer instead?
 	alSourcei(SoundEntries[sound_uid].handle, AL_BUFFER, 0);
+	//PutLog(LogLevel::Info, "Setting 2D source data.");
 	BindBufferData(SoundEntries[sound_uid].bufferHandle, sound_index, looped);
 	if (ALErrorCheck("Binding 2D sound source buffer")) return -1;
 	alSourcei(SoundEntries[sound_uid].handle, AL_BUFFER, SoundEntries[sound_uid].bufferHandle);
 	if (ALErrorCheck("Setting 2D sound source buffer")) return -1;
 
+	//PutLog(LogLevel::Info, "Starting 2D source.");
 	alSourcePlay(SoundEntries[sound_uid].handle);
 	ALErrorCheck("Starting 2D source");
 	NextUID++;
@@ -206,6 +209,7 @@ int llsOpenAL::PlayStream(play_information* play_info)
 	short sound_uid = FindSoundSlot(peakVolume, play_info->priority);
 	if (sound_uid < 0) return -1;
 
+	//PutLog(LogLevel::Info, "Starting a stream");
 	InitSourceStreaming(SoundEntries[sound_uid].handle, peakVolume);
 
 	//Generate buffers
@@ -226,6 +230,7 @@ int llsOpenAL::PlayStream(play_information* play_info)
 
 	if (SoundEntries[sound_uid].streamFormat == -1) return -1;
 
+	//PutLog(LogLevel::Info, "Queueing initial data");
 	alBufferData(SoundEntries[sound_uid].bufferHandles[0], SoundEntries[sound_uid].streamFormat, play_info->m_stream_data, play_info->m_stream_bufsize, 22050);
 	ALErrorCheck("Creating initial stream buffer");
 	alSourceQueueBuffers(SoundEntries[sound_uid].handle, 1, &SoundEntries[sound_uid].bufferHandles[0]);
@@ -233,6 +238,7 @@ int llsOpenAL::PlayStream(play_information* play_info)
 	SoundEntries[sound_uid].bufferStatus[0] = true;
 	ALErrorCheck("Queueing initial streaming buffer");
 
+	//PutLog(LogLevel::Info, "Starting");
 	alSourcePlay(SoundEntries[sound_uid].handle);
 	ALErrorCheck("Starting streaming source");
 
@@ -251,6 +257,7 @@ int llsOpenAL::PlayStream(play_information* play_info)
 
 void llsOpenAL::SetListener(pos_state* cur_pos)
 {
+	//PutLog(LogLevel::Info, "Setting listener.");
 	ListenerOrient = *cur_pos->orient;
 	ListenerPosition = *cur_pos->position;
 	ListenerVelocty = *cur_pos->velocity;
@@ -272,6 +279,8 @@ int llsOpenAL::PlaySound3d(play_information* play_info, int sound_index, pos_sta
 	if (pSoundFiles[pSounds[sound_index].sample_index].used == 0) return -1;
 	short sound_uid = FindSoundSlot(master_volume, play_info->priority);
 	if (sound_uid < 0) return -1;
+
+	//PutLog(LogLevel::Info, "Starting 3D source");
 
 	bool looped = f_looped || (pSounds[sound_index].flags & SPF_LOOPED) != 0;
 
@@ -421,6 +430,8 @@ bool llsOpenAL::CheckAndForceSoundDataAlloc(int sound_file_index)
 	int sound_file_index_00;
 	char cVar1;
 
+	//PutLog(LogLevel::Info, "Allocating sound file");
+
 	sound_file_index_00 = pSounds[sound_file_index].sample_index;
 	if ((sound_file_index_00 < 0) || (999 < sound_file_index_00)) 
 	{
@@ -445,6 +456,7 @@ void llsOpenAL::SoundStartFrame(void)
 	{
 		if (SoundEntries[i].playing && SoundEntries[i].streaming)
 		{
+			//PutLog(LogLevel::Info, "Servicing a stream");
 			ServiceStream(i);
 		}
 	}
@@ -456,6 +468,8 @@ void llsOpenAL::SoundEndFrame(void)
 	if (!Initalized) return;
 	int i;
 	ALint state;
+
+	//PutLog(LogLevel::Info, "Ending sound system frame");
 
 	//Free buffers and update playing state of all current sounds.
 	for (int i = 0; i < NumSoundChannels; i++)
@@ -556,6 +570,7 @@ short llsOpenAL::FindSoundSlot(float volume, int priority)
 	int bestPriority = INT_MAX;
 	int bestSlot = -1;
 	float bestVolume = 1.0f;
+	//PutLog(LogLevel::Info, "Finding a sound slot");
 	//No free slots, so bump a low priorty one.
 	if (NumSoundsPlaying >= NumSoundChannels)
 	{
@@ -679,6 +694,11 @@ void llsOpenAL::BindBufferData(uint32_t handle, int sound_index, bool looped)
 	int len = bpp * pSoundFiles[pSounds[sound_index].sample_index].np_sample_length;
 
 	//PutLog(LogLevel::Info, "Buffering sound id %d (%s)", sound_index, pSoundFiles[pSounds[sound_index].sample_index].name);
+	if (!ptr)
+	{
+		PutLog(LogLevel::Error, "Tried to start sound %s but got nullptr.", pSoundFiles[pSounds[sound_index].sample_index].name);
+		return;
+	}
 	alBufferData(handle, fmt, ptr, len, 22050);
 
 	pSoundFiles[pSounds[sound_index].sample_index].use_count++;
@@ -794,6 +814,12 @@ void llsOpenAL::ServiceStream(int soundID)
 
 		SoundEntries[soundID].info->m_stream_bufsize = size;
 		SoundEntries[soundID].info->m_stream_data = data;
+
+		if (!data)
+		{
+			PutLog(LogLevel::Error, "Tried to queue streaming buffer, but got nullptr.");
+			return;
+		}
 
 		if (size != 0 && data != nullptr)
 		{
