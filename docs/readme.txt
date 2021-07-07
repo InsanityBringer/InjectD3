@@ -1,0 +1,109 @@
+InjectD3:
+
+	This is a program to patch Descent 3 with various fixes and changes. 
+
+Requirements:
+
+	At the moment, InjectD3 works with two versions of Descent 3:
+		* EU 1.4, 1,818,624 bytes, 
+			SHA256: 8B6756BFE10EAD8ABAEFF2E76E58BC3AB0564F8D2DA9860B577B3620585FA50F
+		* US 1.4, 1,794,048 bytes,
+			SHA256: 74D2F678BCB2C4369DD1E05C2F78D7A038884C54B64AE639211C17652316C3F4
+			This version is preferred, since it is included with copies purchased on GOG.com and Steam.
+			
+	Additionally, InjectD3Configuration requires a .net runtime to run. If this isn't present, the config file
+	can still be edited manually.
+			
+Basic usage:
+
+* Unzip the contents of the archive into your Descent 3 directory. 
+* Configure Descent 3 with the original launcher to use OpenGL graphics, as only the OpenGL renderer is patched at the moment.
+* (optional) Rename or delete the "movies" folder. The FMV sequences will still disrupt the screen resolution, as I haven't 
+	found where to patch it yet.
+* Run InjectD3Configuration to configure the patch. This only needs to be done once, unless you wish to change options later.
+* Run InjectD3 instead of the original launcher to start the game. 
+
+Available patches:
+
+	The following patches are available at the moment, grouped into 3 sections currently.
+	
+	Graphics patches:
+		Display adaptor: 
+			Forces the screen onto a given display. Only works with Windowed or NewFullscreen modes.
+		
+			InjectD3.cfg name: DisplayNum
+			Valid values: -1 to the highest numbered display available.
+			
+		Field of view:
+			The game's field of view. 72 is the default.
+			
+			InjectD3.cfg name: FieldOfView
+			Valid values: 10 to 179. 
+			
+		Force 32-bit color:
+			Forces the game to always use 32-bit color for the display.
+			
+			InjectD3.cfg name: Force32Bit
+			Valid values: 0 or 1.
+		
+		Force -z32
+			Forces the -z32 command line option.
+			
+			InjectD3.cfg name: ForceZ32
+			Valid values: 0 or 1.
+			
+		Multisampling count
+			Enables multisampling for basic anti-aliasing. The count is the amount of samples taken.
+			
+			InjectD3.cfg name: MultisampleCount
+			Valid values: 1 to disable, 2, 4, 8, 16... to enable
+			
+		Screen mode:
+			Changes the game's screen mode. There are 3 options:
+				*Original: The original fullscreen mode, which disrupts your desktop resolution and layout. Not recommended.
+				*Windowed: Windowed mode. The size of the window will match the game's current resolution. 
+					Use -width and -height command line parameters to change this resolution in-game.
+					Note that at the moment the dedicated server will not function correctly when this patch is set.
+				*BorderlessFullscreen: Fullscreen via borderless window. The game's contents will be scaled to match your
+					current desktop resolution. Use -width and -height command line parameters to change this resolution 
+					in-game.
+	
+			InjectD3.cfg name: ScreenMode
+			Valid values: 0 for Original, 1 for Windowed, 2 for BorderlessFullscreen.
+			
+	Input patches:
+		New mouse library:
+			Enables new mouse code, using Windows's Raw Input APIs. Absolutely vital for windowed and borderless windowed modes
+			I don't even know why this is a user option, it is literally impossible to use those modes with the old DirectInput
+			mouse code. 
+			
+			InjectD3.cfg name: NewMouse
+			Valid values: 1.
+			
+	Audio patches:
+		OpenAL sound code:
+			Patches the original sound system with a new OpenAL based sound system. This option is currently very experimental,
+			and may crash or sound weird on some systems. If it works, this system allows for better positional audio 
+			(currently with linear falloff though), and avoids the crackling problem with DirectSound on modern Windows
+			systems.
+			
+			InjectD3.cfg name: NewSoundSystem
+			Valid values: 0, 1
+			
+Known bugs:
+
+	The following bugs are known and will be fixed in future versions, hopefully:
+		*The mouse doesn't work in briefings, but it will work in the automap.
+		*FMV sequences will still disrupt the screen resolution. 
+		*Dedicated server won't work when Windowed mode is patched. 
+			
+Future patches:
+
+	The following patches are planned:
+		*Patch to change the registry root from HKEY_LOCAL_MACHINE to HKEY_CURRENT_USER so you don't need to run as admin to
+			configure the game
+		*Patch to fix issues with the mouse button being released at high framerates.
+		*Shader-based OpenGL renderer that supports bumpmaps.
+		*Ability to automatically set -width, -height, -aspect, -framecap, and other command-line parameters automatically
+			from InjectD3.cfg
+		*Support for more versions of Descent 3. 
