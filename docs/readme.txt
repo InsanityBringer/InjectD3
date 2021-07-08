@@ -7,9 +7,13 @@ Requirements:
 	At the moment, InjectD3 works with two versions of Descent 3:
 		* EU 1.4, 1,818,624 bytes, 
 			SHA256: 8B6756BFE10EAD8ABAEFF2E76E58BC3AB0564F8D2DA9860B577B3620585FA50F
+			If you have the dateiliste repack version, you should have this version.
+			The version with Alexi's 32-bit patch should work without conflicts with my patch. 
+			
 		* US 1.4, 1,794,048 bytes,
 			SHA256: 74D2F678BCB2C4369DD1E05C2F78D7A038884C54B64AE639211C17652316C3F4
 			This version is preferred, since it is included with copies purchased on GOG.com and Steam.
+			The "Black Pyro Justice" mod is built against this version, and may work with patches.
 			
 	Additionally, InjectD3Configuration requires a .net runtime to run. If this isn't present, the config file
 	can still be edited manually.
@@ -96,6 +100,10 @@ Known bugs:
 		*The mouse doesn't work in briefings, but it will work in the automap.
 		*FMV sequences will still disrupt the screen resolution. 
 		*Dedicated server won't work when Windowed mode is patched. 
+		*Cockpit is unusable with widescreen resolutions.
+		*Borderless window is slightly hacky. Ah, if I had the patience I'd make an API on top of vulkan that isn't as low
+			level, but retains the much better context creation features to avoid Windows's OpenGL hacks.
+		*Sensitivity of the mouse in the menu system needs adjustment.
 			
 Future patches:
 
@@ -107,3 +115,9 @@ Future patches:
 		*Ability to automatically set -width, -height, -aspect, -framecap, and other command-line parameters automatically
 			from InjectD3.cfg
 		*Support for more versions of Descent 3. 
+		
+Credits:
+
+Arne for getting this mess started in the first place by finding functions in the game's executable, for pointing me to inject, and all sorts of technical support.
+mewrev for inject (https://github.com/mewrev/inject), which InjectD3 was built on top of.
+The new sound code uses OpenAL Soft for full 3D sound.
