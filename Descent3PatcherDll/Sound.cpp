@@ -28,10 +28,20 @@
 #include "Sound.h"
 #include "GameOffsets.h"
 
+//Configuration
+bool ConfigUseReverbs = false;
 
 //Pointers to original data:
 sound_info* pSounds;
 sound_file_info* pSoundFiles;
+
+LPALGENAUXILIARYEFFECTSLOTS dalGenAuxiliaryEffectSlots;
+LPALGENEFFECTS dalGenEffects;
+LPALDELETEEFFECTS dalDeleteEffects;
+LPALDELETEAUXILIARYEFFECTSLOTS dalDeleteAuxiliaryEffectSlots;
+LPALEFFECTI dalEffecti;
+LPALEFFECTF dalEffectf;
+LPALAUXILIARYEFFECTSLOTI dalAuxiliaryEffectSloti;
 
 char (*SoundLoadWaveFile)(char* filename, float percent_volume, int sound_file_index, bool f_high_quality, bool f_load_sample_data, int* e_type);
 
@@ -61,7 +71,8 @@ void llsOpenAL::SetSoundCard(const char* name)
 
 int llsOpenAL::InitSoundLib(char mixer_type, oeWin32Application* sos, unsigned char max_sounds_played)
 {
-	int i;
+	int i, numsends;
+	ALCint attribs[4] = {};
 	//MessageBoxA(nullptr, "Horrible hack has been started up", "Cursed", MB_OK);
 	Device = alcOpenDevice(nullptr);
 	//ALErrorCheck("Opening device");
@@ -70,7 +81,25 @@ int llsOpenAL::InitSoundLib(char mixer_type, oeWin32Application* sos, unsigned c
 		PutLog(LogLevel::Error, "OpenAL LLS failed to open a device.");
 		return 0;
 	}
-	Context = alcCreateContext(Device, nullptr);
+
+	EffectsSupported = alcIsExtensionPresent(nullptr, "ALC_EXT_EFX") != AL_FALSE;
+	if (!EffectsSupported)
+		PutLog(LogLevel::Warning, "OpenAL effects extension not present!");
+	else
+	{
+		if (ConfigUseReverbs)
+		{
+			EffectsSupported = false;
+		}
+		else
+		{
+			//Just one environment available, so only one send needed
+			attribs[0] = ALC_MAX_AUXILIARY_SENDS;
+			attribs[1] = 1;
+		}
+	}
+
+	Context = alcCreateContext(Device, attribs);
 	//ALErrorCheck("Creating context");
 	if (!Context)
 	{
@@ -80,10 +109,18 @@ int llsOpenAL::InitSoundLib(char mixer_type, oeWin32Application* sos, unsigned c
 	}
 	alcMakeContextCurrent(Context);
 
-	//Check for OpenAL Soft loop points
 	LoopPointsSupported = alIsExtensionPresent("AL_SOFT_loop_points") != AL_FALSE;
 	if (!LoopPointsSupported)
-		PutLog(LogLevel::Warning, "OpenAL LLS failed to load loop points extension, OpenAL may not be OpenAL soft.");
+		PutLog(LogLevel::Warning, "OpenAL Soft loop points extension not present!");
+
+	//Check if that one send is available, though there's no reason to assume it won't...
+	alcGetIntegerv(Device, ALC_MAX_AUXILIARY_SENDS, 1, &numsends);
+
+	if (numsends < 1)
+	{
+		PutLog(LogLevel::Warning, "OpenAL effects extension failed to provide any sends?");
+		EffectsSupported = false;
+	}
 
 	alDistanceModel(AL_LINEAR_DISTANCE_CLAMPED);
 
@@ -101,6 +138,42 @@ int llsOpenAL::InitSoundLib(char mixer_type, oeWin32Application* sos, unsigned c
 		alGenBuffers(1, &SoundEntries[i].bufferHandle);
 	}
 	ALErrorCheck("Creating default buffers");
+
+	if (EffectsSupported)
+	{
+		//Load and validate function pointers
+		dalGenAuxiliaryEffectSlots = (LPALGENAUXILIARYEFFECTSLOTS)alGetProcAddress("alGenAuxiliaryEffectSlots");
+		dalDeleteAuxiliaryEffectSlots = (LPALDELETEAUXILIARYEFFECTSLOTS)alGetProcAddress("alDeleteAuxiliaryEffectSlots");
+		dalGenEffects = (LPALGENEFFECTS)alGetProcAddress("alGenEffects");
+		dalDeleteEffects = (LPALDELETEEFFECTS)alGetProcAddress("alDeleteEffects");
+		dalEffecti = (LPALEFFECTI)alGetProcAddress("alEffecti");
+		dalEffectf = (LPALEFFECTF)alGetProcAddress("alEffectf");
+		dalAuxiliaryEffectSloti = (LPALAUXILIARYEFFECTSLOTI)alGetProcAddress("alAuxiliaryEffectSloti");
+
+		if (!dalGenAuxiliaryEffectSlots || !dalDeleteAuxiliaryEffectSlots || !dalGenEffects || !dalDeleteEffects || !dalEffecti || !dalEffectf || !dalAuxiliaryEffectSloti)
+		{
+			PutLog(LogLevel::Warning, "Failed to get OpenAL effects extension function pointers.");
+			EffectsSupported = false;
+		}
+		else
+		{
+			//Generate the effect and aux effect slot
+			//Just one since there's only a single global environment.
+			dalGenEffects(1, &EffectSlot);
+			ALErrorCheck("Creating effect");
+			dalGenAuxiliaryEffectSlots(1, &AuxEffectSlot);
+			ALErrorCheck("Creating aux effect");
+
+			//Make the effect an EAX reverb
+			dalEffecti(EffectSlot, AL_EFFECT_TYPE, AL_EFFECT_EAXREVERB);
+			ALErrorCheck("Setting effect type");
+			SetGlobalReverbProperties(0.5, 0.3, 10.0); //These appear to be the default values Descent 3 uses.
+
+			//Make the aux effect slot use the effect
+			dalAuxiliaryEffectSloti(AuxEffectSlot, AL_EFFECTSLOT_EFFECT, EffectSlot);
+			ALErrorCheck("Setting aux effect slot");
+		}
+	}
 
 	PutLog(LogLevel::Info, "OpenAL LLS started successfully. %d channels specified.", max_sounds_played);
 	Initalized = true;
@@ -495,7 +568,21 @@ void llsOpenAL::SoundEndFrame(void)
 
 bool llsOpenAL::SetGlobalReverbProperties(float volume, float damping, float decay)
 {
-	return false;
+	if (!EffectsSupported)
+		return false;
+
+	PutLog(LogLevel::Info, "Got Environmental params: vol: %f, damping: %f, decay: %f.", volume, damping, decay);
+	Volume = volume;
+	Damping = damping;
+	Decay = decay;
+
+	dalEffectf(EffectSlot, AL_EAXREVERB_DECAY_TIME, decay);
+	ALErrorCheck("Setting reverb decay");
+	dalEffectf(EffectSlot, AL_EAXREVERB_GAIN, min(volume, 1.0f));
+	ALErrorCheck("Setting reverb gain");
+	dalEffectf(EffectSlot, AL_EAXREVERB_GAINHF, min(damping, 1.0f));
+	ALErrorCheck("Setting reverb gainhf");
+	return true;
 }
 
 void llsOpenAL::SetEnvironmentValues(const t3dEnvironmentValues* env)
@@ -684,6 +771,9 @@ void llsOpenAL::InitSource3D(uint32_t handle, sound_info* soundInfo, pos_state* 
 	alSourcef(handle, AL_MAX_DISTANCE, soundInfo->max_distance);
 
 	alSourcei(handle, AL_LOOPING, AL_FALSE);
+
+	if (EffectsSupported)
+		alSource3i(handle, AL_AUXILIARY_SEND_FILTER, AuxEffectSlot, 0, NULL);
 }
 
 void llsOpenAL::BindBufferData(uint32_t handle, int sound_index, bool looped)
@@ -739,6 +829,12 @@ void llsOpenAL::SoundCleanup(int soundID)
 
 	//Unbind the buffer for later use
 	alSourcei(SoundEntries[soundID].handle, AL_BUFFER, 0);
+	//Clear the sound's send filter, if it has one. 
+	if (EffectsSupported)
+	{
+		alSource3i(SoundEntries[soundID].handle, AL_AUXILIARY_SEND_FILTER, AL_EFFECTSLOT_NULL, 0, NULL);
+		ALErrorCheck("Clearing source send filter");
+	}
 
 	//Streaming sounds need to clean up all their buffers
 	if (SoundEntries[soundID].streaming)
@@ -817,7 +913,7 @@ void llsOpenAL::ServiceStream(int soundID)
 
 		if (!data)
 		{
-			PutLog(LogLevel::Error, "Tried to queue streaming buffer, but got nullptr.");
+			//PutLog(LogLevel::Error, "Tried to queue streaming buffer, but got nullptr.");
 			return;
 		}
 

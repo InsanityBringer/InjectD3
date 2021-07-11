@@ -67,7 +67,8 @@ ConfigEntry configList[] = {
 	{"ForceZ32", ConfigType::Boolean, &ConfigForceZ32},
 	{"MultisampleCount", ConfigType::Integer, &ConfigMultisampleCount},
 	{"DisplayNum", ConfigType::Integer, &DisplayNum},
-	{"FieldOfView", ConfigType::Float, &DefaultFov} };
+	{"FieldOfView", ConfigType::Float, &DefaultFov},
+	{"NewSoundSystemReverbs", ConfigType::Boolean, &ConfigUseReverbs} };
 
 #define CONFIGLISTSIZE (sizeof(configList) / sizeof(ConfigEntry))
 

@@ -34,6 +34,7 @@ extern bool PatchSoundSystem;
 extern bool ConfigForce32BitMode;
 extern bool ConfigForceZ32;
 extern int ConfigMultisampleCount;
+extern bool ConfigUseReverbs;
 
 //Automatically determined options
 extern bool AutoUseSubBuffer;

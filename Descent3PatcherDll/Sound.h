@@ -348,7 +348,7 @@ class llsOpenAL : public llsSystem
 	int ListenerRoomNum;
 
 	bool Initalized;
-	bool LoopPointsSupported;
+	bool LoopPointsSupported, EffectsSupported;
 	char Quality;
 
 	int NumSoundChannels;
@@ -359,6 +359,10 @@ class llsOpenAL : public llsSystem
 	//OpenAL state
 	ALCcontext* Context;
 	ALCdevice* Device;
+
+	ALuint AuxEffectSlot, EffectSlot;
+
+	float Volume, Damping, Decay;
 
 	bool ALErrorCheck(const char* context);
 
@@ -376,7 +380,7 @@ public:
 	llsOpenAL()
 	{
 		Initalized = false;
-		LoopPointsSupported = false;
+		LoopPointsSupported = EffectsSupported = false;
 		Quality = SQT_HIGH;
 		NumSoundChannels = 0;
 		NumSoundsPlaying = 0;
@@ -389,6 +393,9 @@ public:
 		ListenerRoomNum = 0;
 
 		Context = nullptr; Device = nullptr;
+
+		AuxEffectSlot = EffectSlot = 0;
+		Volume = Damping = Decay = 0;
 	}
 	// may be called before init (must be to be valid, the card passed here will be initialized in InitSoundLib)
 	void SetSoundCard(const char* name) override;
