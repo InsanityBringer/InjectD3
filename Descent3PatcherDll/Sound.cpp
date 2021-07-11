@@ -168,10 +168,6 @@ int llsOpenAL::InitSoundLib(char mixer_type, oeWin32Application* sos, unsigned c
 			dalEffecti(EffectSlot, AL_EFFECT_TYPE, AL_EFFECT_EAXREVERB);
 			ALErrorCheck("Setting effect type");
 			SetGlobalReverbProperties(0.5, 0.3, 10.0); //These appear to be the default values Descent 3 uses.
-
-			//Make the aux effect slot use the effect
-			dalAuxiliaryEffectSloti(AuxEffectSlot, AL_EFFECTSLOT_EFFECT, EffectSlot);
-			ALErrorCheck("Setting aux effect slot");
 		}
 	}
 
@@ -576,12 +572,21 @@ bool llsOpenAL::SetGlobalReverbProperties(float volume, float damping, float dec
 	Damping = damping;
 	Decay = decay;
 
+	//Make the aux effect slot use the effect
+	dalAuxiliaryEffectSloti(AuxEffectSlot, AL_EFFECTSLOT_EFFECT, 0);
+	ALErrorCheck("Setting aux effect slot");
+
 	dalEffectf(EffectSlot, AL_EAXREVERB_DECAY_TIME, decay);
 	ALErrorCheck("Setting reverb decay");
 	dalEffectf(EffectSlot, AL_EAXREVERB_GAIN, min(volume, 1.0f));
 	ALErrorCheck("Setting reverb gain");
 	dalEffectf(EffectSlot, AL_EAXREVERB_GAINHF, min(damping, 1.0f));
 	ALErrorCheck("Setting reverb gainhf");
+
+	//Make the aux effect slot use the effect
+	dalAuxiliaryEffectSloti(AuxEffectSlot, AL_EFFECTSLOT_EFFECT, EffectSlot);
+	ALErrorCheck("Setting aux effect slot");
+
 	return true;
 }
 

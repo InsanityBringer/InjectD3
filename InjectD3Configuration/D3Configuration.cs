@@ -63,6 +63,11 @@ namespace InjectD3Configuration
         [Description("Patches the sound code to use OpenAL. This can fix crackling sounds and results in more involved positional audio. This is experimental and possibly buggy at the moment, but should be usable.")]
         [DefaultValue(false)]
         public bool PatchSoundSystem { get; set; } = false;
+        [Category("Audio")]
+        [DisplayName("OpenAL reverbs")]
+        [Description("Makes the OpeanAL sound code use reverbs.")]
+        [DefaultValue(true)]
+        public bool UseReverbs { get; set; } = true;
         [Category("Graphics")]
         [DisplayName("Force -z32")]
         [Description("Uses 32-bit depth buffer. This is implied if using the new fullscreen mode.")]
@@ -85,6 +90,7 @@ namespace InjectD3Configuration
             sw.WriteLine("ScreenMode={0}", (int)ScreenMode);
             sw.WriteLine("NewMouse={0}", PatchMouse ? 1 : 0);
             sw.WriteLine("NewSoundSystem={0}", PatchSoundSystem ? 1 : 0);
+            sw.WriteLine("NewSoundSystemReverbs={0}", UseReverbs ? 1 : 0);
             sw.WriteLine("Force32Bit={0}", Force32BitColor ? 1 : 0);
             sw.WriteLine("ForceZ32={0}", ForceZ32 ? 1 : 0);
             sw.WriteLine("MultisampleCount={0}", MultiSampleCount);

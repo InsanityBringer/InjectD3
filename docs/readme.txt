@@ -93,6 +93,12 @@ Available patches:
 			
 			InjectD3.cfg name: NewSoundSystem
 			Valid values: 0, 1
+		OpenAL reverbs:
+			Enables reverbations for the OpenAL sound system, similar to the original game's sound system when using EAX-
+			enabled sound cards.
+			
+			InjectD3.cfg name: NewSoundSystemReverbs
+			Valid values: 0, 1
 			
 Known bugs:
 
