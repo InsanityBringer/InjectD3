@@ -580,8 +580,20 @@ bool llsOpenAL::SetGlobalReverbProperties(float volume, float damping, float dec
 	ALErrorCheck("Setting reverb decay");
 	dalEffectf(EffectSlot, AL_EAXREVERB_GAIN, min(volume, 1.0f));
 	ALErrorCheck("Setting reverb gain");
-	dalEffectf(EffectSlot, AL_EAXREVERB_GAINHF, min(damping, 1.0f));
-	ALErrorCheck("Setting reverb gainhf");
+	if (damping > 1.0f)
+	{
+		dalEffectf(EffectSlot, AL_EAXREVERB_GAINHF, 1.0f);
+		ALErrorCheck("Setting reverb gainlf");
+		dalEffectf(EffectSlot, AL_EAXREVERB_GAINLF, 2.0f - damping);
+		ALErrorCheck("Setting reverb gainhf");
+	}
+	else
+	{
+		dalEffectf(EffectSlot, AL_EAXREVERB_GAINLF, 1.0f);
+		ALErrorCheck("Setting reverb gainlf");
+		dalEffectf(EffectSlot, AL_EAXREVERB_GAINHF, damping);
+		ALErrorCheck("Setting reverb gainhf");
+	}
 
 	//Make the aux effect slot use the effect
 	dalAuxiliaryEffectSloti(AuxEffectSlot, AL_EFFECTSLOT_EFFECT, EffectSlot);
@@ -689,7 +701,7 @@ short llsOpenAL::FindSoundSlot(float volume, int priority)
 		if (bestSlot != -1)
 		{
 			StopSound(SoundEntries[bestSlot].soundUID);
-			PutLog(LogLevel::Warning, "Bumping sound %d due to insufficient slots.", bestSlot);
+			//PutLog(LogLevel::Warning, "Bumping sound %d due to insufficient slots.", bestSlot);
 		}
 		else
 		{
