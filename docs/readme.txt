@@ -89,7 +89,8 @@ Available patches:
 		New mouse library:
 			Enables new mouse code, using Windows's Raw Input APIs. Absolutely vital for windowed and borderless windowed modes
 			I don't even know why this is a user option, it is literally impossible to use those modes with the old DirectInput
-			mouse code. 
+			mouse code. This also *should* fix Fusion and Mass Driver dropping inputs at high framerates, so long as you don't
+			run with -lorestimer for some dumb reason. 
 			
 			InjectD3.cfg name: NewMouse
 			Valid values: 1.
@@ -124,9 +125,6 @@ Known bugs:
 Future patches:
 
 	The following patches are planned:
-		*Patch to change the registry root from HKEY_LOCAL_MACHINE to HKEY_CURRENT_USER so you don't need to run as admin to
-			configure the game
-		*Patch to fix issues with the mouse button being released at high framerates.
 		*Shader-based OpenGL renderer that supports bumpmaps.
 		*Ability to automatically set -width, -height, -aspect, -framecap, and other command-line parameters automatically
 			from InjectD3.cfg
