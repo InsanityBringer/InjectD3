@@ -53,3 +53,4 @@ struct mses_state
 };
 
 bool InitNewMouse();
+float ddio_MouseBtnDownTime(int btn);

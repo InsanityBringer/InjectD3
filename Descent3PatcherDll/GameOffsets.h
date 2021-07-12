@@ -58,6 +58,7 @@ enum class PatchPoint
 	TimerGetTimeFunc,
 	MemMallocSubFunc,
 	SoundLoadWaveFileFunc,
+	MouseBtnDownTimeThunk,
 
 	//variables
 	AppVar,

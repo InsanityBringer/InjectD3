@@ -99,6 +99,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
                 PutLogInit(LogLevel::Info, "Patching mouse library.");
                 //Patch DDIO startup function with new raw input mouse startup. 
                 CreateCallTo(GetPatchPoint(PatchPoint::InitMouseCall), (uintptr_t)&InitNewMouse);
+                //Thunk ddio_MouseBtnDownTime
+                CreateJmpTo(GetPatchPoint(PatchPoint::MouseBtnDownTimeThunk), (uintptr_t)&ddio_MouseBtnDownTime);
             }
 
             //Windowed mode patch:

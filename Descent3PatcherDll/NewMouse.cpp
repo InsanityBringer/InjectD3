@@ -57,6 +57,10 @@ t_mse_event;
 t_mse_button_info* pDIM_buttons;
 tQueue<t_mse_event, 16>* pMB_queue;
 
+//Normally mouse events use ticks, attempting to use timer_GetTime which has more accuracy to smooth over bug with mouse buttons dropping. 
+float localDownStart[N_MSEBTNS];
+float localUpStart[N_MSEBTNS];
+
 #define MOUSE_ZMIN		0						// mouse wheel z min and max (increments of 120 = 10 units)
 #define MOUSE_ZMAX		1200
 #define N_DIMSEBTNS		4						// # of REAL mouse buttons
@@ -142,6 +146,31 @@ void ddio_MouseReset()
 	// reset button states
 	//ddio_MouseQueueFlush();
 }
+
+// return mouse button down time.
+// This function has been hacked to use timer_GetTime which can be much more accurate. 
+float ddio_MouseBtnDownTime(int btn)
+{
+	//DWORD ticks, curticks = GetTickCount();
+	float time, curtime = timer_GetTime();
+
+	//ASSERT(btn >= 0 && btn < N_MSEBTNS);
+
+	if (pDIM_buttons->is_down[btn])
+	{
+		time = curtime - localDownStart[btn];
+		pDIM_buttons->time_down[btn] = (int)(curtime*1000);
+		localDownStart[btn] = curtime;
+	}
+	else 
+	{
+		time = localUpStart[btn] - localDownStart[btn];
+		localUpStart[btn] = localDownStart[btn] = 0;
+	}
+
+	return time;
+}
+
 //-----------------------------------------------------------------------------
 // End Outrage-licensed code.
 //-----------------------------------------------------------------------------
@@ -155,11 +184,6 @@ int RawInputHandler(HWND hWnd, unsigned int msg, unsigned int wParam, long lPara
 {
 	uint32_t buttons;
 	t_mse_event ev;
-	/*if (!handlerCalled)
-	{
-		MessageBoxA(hWnd, "Alright, bring it on!", "Ara ara~", MB_OK);
-		handlerCalled = true;
-	}*/
 
 	if (pDDIO_mouse_state->suspended) 
 	{
@@ -192,6 +216,7 @@ int RawInputHandler(HWND hWnd, unsigned int msg, unsigned int wParam, long lPara
 				{
 					pDIM_buttons->down_count[0]++;
 					pDIM_buttons->time_down[0] = GetTickCount();
+					localDownStart[0] = timer_GetTime();
 					pDIM_buttons->is_down[0] = true;
 					pDDIO_mouse_state->btn_flags |= MOUSE_LB;
 					ev.btn = 0;
@@ -207,6 +232,7 @@ int RawInputHandler(HWND hWnd, unsigned int msg, unsigned int wParam, long lPara
 					pDIM_buttons->up_count[0]++;
 					pDIM_buttons->is_down[0] = false;
 					pDIM_buttons->time_up[0] = GetTickCount();
+					localUpStart[0] = timer_GetTime();
 					pDDIO_mouse_state->btn_flags &= ~MOUSE_LB;
 					ev.btn = 0;
 					ev.state = false;
@@ -220,6 +246,7 @@ int RawInputHandler(HWND hWnd, unsigned int msg, unsigned int wParam, long lPara
 				{
 					pDIM_buttons->down_count[1]++;
 					pDIM_buttons->time_down[1] = GetTickCount();
+					localDownStart[1] = timer_GetTime();
 					pDIM_buttons->is_down[1] = true;
 					pDDIO_mouse_state->btn_flags |= MOUSE_RB;
 					ev.btn = 0;
@@ -231,6 +258,7 @@ int RawInputHandler(HWND hWnd, unsigned int msg, unsigned int wParam, long lPara
 					pDIM_buttons->up_count[1]++;
 					pDIM_buttons->is_down[1] = false;
 					pDIM_buttons->time_up[1] = GetTickCount();
+					localUpStart[2] = timer_GetTime();
 					pDDIO_mouse_state->btn_flags &= ~MOUSE_RB;
 					ev.btn = 0;
 					ev.state = false;
@@ -240,6 +268,7 @@ int RawInputHandler(HWND hWnd, unsigned int msg, unsigned int wParam, long lPara
 				{
 					pDIM_buttons->down_count[2]++;
 					pDIM_buttons->time_down[2] = GetTickCount();
+					localDownStart[3] = timer_GetTime();
 					pDIM_buttons->is_down[2] = true;
 					pDDIO_mouse_state->btn_flags |= MOUSE_CB;
 					ev.btn = 0;
@@ -251,6 +280,7 @@ int RawInputHandler(HWND hWnd, unsigned int msg, unsigned int wParam, long lPara
 					pDIM_buttons->up_count[2]++;
 					pDIM_buttons->is_down[2] = false;
 					pDIM_buttons->time_up[2] = GetTickCount();
+					localUpStart[3] = timer_GetTime();
 					pDDIO_mouse_state->btn_flags &= ~MOUSE_CB;
 					ev.btn = 0;
 					ev.state = false;
@@ -366,9 +396,6 @@ bool InitNewMouse()
 			PutLog(LogLevel::Error, "HID Registration failed: %d.", GetLastError());
 			return false;
 		}
-
-		//If the device registered properly, register a handler for WM_INPUT messages
-		//MessageBoxA(app->m_hWnd, "Is this hWnd any good?", "Ara ara~", MB_OK);
 
 		//HACK: Need to flush messages for this to work.
 		MSG msg;

@@ -92,6 +92,7 @@ bool InitPatchPoints(GameVersion ver)
 		PatchMap[PatchPoint::DDIOMouseInitVar] = 0xe1d1b8;
 		PatchMap[PatchPoint::DIMButtonsVar] = 0xe1d160;
 		PatchMap[PatchPoint::MBQueueVar] = 0xe1d0c8;
+		PatchMap[PatchPoint::MouseBtnDownTimeThunk] = 0x504fd0;
 
 		//sound things
 		PatchMap[PatchPoint::SoundsVar] = 0xdfa8d8;
@@ -169,6 +170,7 @@ bool InitPatchPoints(GameVersion ver)
 		PatchMap[PatchPoint::DDIOMouseInitVar] = 0xe16420;
 		PatchMap[PatchPoint::DIMButtonsVar] = 0xe163c8;
 		PatchMap[PatchPoint::MBQueueVar] = 0xe16330;
+		PatchMap[PatchPoint::MouseBtnDownTimeThunk] = 0x5052c0;
 
 		//sound things
 		PatchMap[PatchPoint::SoundsVar] = 0xdf3b40;
