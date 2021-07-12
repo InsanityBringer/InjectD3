@@ -33,6 +33,7 @@
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.LaunchButton = new System.Windows.Forms.Button();
             this.ExitButton = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // propertyGrid1
@@ -80,6 +81,16 @@
             this.ExitButton.UseVisualStyleBackColor = true;
             this.ExitButton.Click += new System.EventHandler(this.ExitButton_Click);
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(12, 526);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(226, 23);
+            this.button1.TabIndex = 5;
+            this.button1.Text = "Configure HKEY_CURRENT_USER,,,";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // Form1
             // 
             this.AcceptButton = this.LaunchButton;
@@ -87,6 +98,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.ExitButton;
             this.ClientSize = new System.Drawing.Size(484, 561);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.ExitButton);
             this.Controls.Add(this.LaunchButton);
             this.Controls.Add(this.textBox1);
@@ -109,6 +121,7 @@
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button LaunchButton;
         private System.Windows.Forms.Button ExitButton;
+        private System.Windows.Forms.Button button1;
     }
 }
 

@@ -84,6 +84,7 @@ bool InitPatchPoints(GameVersion ver)
 		PatchMap[PatchPoint::ZoomInitLevel] = 0x446b18;
 		PatchMap[PatchPoint::TimerGetTimeFunc] = 0x504900;
 		PatchMap[PatchPoint::MemMallocSubFunc] = 0x564230;
+		PatchMap[PatchPoint::RegistryRoot] = 0x555009;
 
 		//mouse things
 		PatchMap[PatchPoint::AppVar] = 0x63f15c;
@@ -160,6 +161,7 @@ bool InitPatchPoints(GameVersion ver)
 		PatchMap[PatchPoint::ZoomInitLevel] = 0x446ad8;
 		PatchMap[PatchPoint::TimerGetTimeFunc] = 0x504bf0;
 		PatchMap[PatchPoint::MemMallocSubFunc] = 0x564580;
+		PatchMap[PatchPoint::RegistryRoot] = 0x555319;
 
 		//mouse things
 		PatchMap[PatchPoint::AppVar] = 0x6383c4;

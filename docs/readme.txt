@@ -31,6 +31,16 @@ Available patches:
 
 	The following patches are available at the moment, grouped into 3 sections currently.
 	
+	General patches:
+		Use HKEY_CURRENT_USER:
+			Makes the game store registry configuration within the HKEY_CURRENT_USER hive. This makes the configuration 
+			per-user, and makes it possible to configure the game without having to run as administrator on later versions
+			of Windows. Use the included configuration program to set basic configuration options in place of the game's
+			original launcher program.
+			
+			InjectD3.cfg name: UseUserRegistry
+			Valid values: 0, 1. 
+	
 	Graphics patches:
 		Display adaptor: 
 			Forces the screen onto a given display. Only works with Windowed or NewFullscreen modes.

@@ -83,6 +83,11 @@ namespace InjectD3Configuration
         [Description("Enables multisampling with the specified number of samples. 1 = no multisampling.")]
         [DefaultValue(1)]
         public int MultiSampleCount { get; set; } = 1;
+        [Category("General")]
+        [DisplayName("Use HKEY_CURRENT_USER")]
+        [Description("Makes the game store registry configuration in HKEY_CURRENT_USER, rather than HKEY_LOCAL_MACHINE. Makes config per-user and avoids needing adminstrator rights. ")]
+        [DefaultValue(false)]
+        public bool UseHKEYCurrentUser { get; set; } = false;
 
         public void WriteToFile(string filename)
         {
@@ -96,6 +101,7 @@ namespace InjectD3Configuration
             sw.WriteLine("MultisampleCount={0}", MultiSampleCount);
             sw.WriteLine("DisplayNum={0}", DisplayNum);
             sw.WriteLine("FieldOfView={0}", DefaultFov.ToString("G", CultureInfo.InvariantCulture));
+            sw.WriteLine("UseUserRegistry={0}", UseHKEYCurrentUser ? 1 : 0);
 
             sw.Close();
             sw.Dispose();

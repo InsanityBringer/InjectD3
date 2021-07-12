@@ -52,6 +52,7 @@ enum class PatchPoint
 	ZoomClearGameEffects,
 	ZoomDoRespawnZoomEffect,
 	ZoomInitLevel,
+	RegistryRoot,
 
 	//funcs
 	TimerGetTimeFunc,

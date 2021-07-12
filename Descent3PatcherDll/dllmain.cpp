@@ -38,11 +38,12 @@
 
 FILE* outputFile;
 
+bool PatchRegistryRoot = false;
+
 void PatchMemory(uintptr_t address, uint8_t* data, size_t len);
 void CreateCallTo(uintptr_t srcAddress, uintptr_t funcAddress);
 void CreateJmpTo(uintptr_t srcAddress, uintptr_t funcAddress);
 void NOPMemory(uintptr_t address, size_t count);
-void Die();
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
@@ -84,6 +85,13 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
             //Prototype patch #2: Patch init_reg call with a simple function
             //uint32_t offset = (uint32_t)&Die - (0x4f7b49 + 4); //patch init_reg
             //PatchMemory(0x4f7b49, (uint8_t*)&offset, sizeof(offset));
+
+            if (PatchRegistryRoot)
+            {
+                HKEY hack = HKEY_CURRENT_USER;
+                PutLogInit(LogLevel::Info, "Patching registry root to HKEY_CURRENT_USER.");
+                PatchMemory(GetPatchPoint(PatchPoint::RegistryRoot), (uint8_t*)&hack, sizeof(HKEY));
+            }
 
             if (PatchMouseLibrary)
             {
@@ -207,10 +215,4 @@ void NOPMemory(uintptr_t address, size_t count)
         *(uint8_t*)(address + (i)) = 0x90;
     }
     VirtualProtect((LPVOID)address, count, oldProtect, &oldProtect);
-}
-
-void Die()
-{
-    MessageBoxA(NULL, "Shotas are very cute, don't you think?", "Shotas", MB_OK);
-    (*(int*)(0)) = 1;
 }

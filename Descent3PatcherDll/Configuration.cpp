@@ -68,7 +68,8 @@ ConfigEntry configList[] = {
 	{"MultisampleCount", ConfigType::Integer, &ConfigMultisampleCount},
 	{"DisplayNum", ConfigType::Integer, &DisplayNum},
 	{"FieldOfView", ConfigType::Float, &DefaultFov},
-	{"NewSoundSystemReverbs", ConfigType::Boolean, &ConfigUseReverbs} };
+	{"NewSoundSystemReverbs", ConfigType::Boolean, &ConfigUseReverbs},
+	{"UseUserRegistry", ConfigType::Boolean, &PatchRegistryRoot} };
 
 #define CONFIGLISTSIZE (sizeof(configList) / sizeof(ConfigEntry))
 

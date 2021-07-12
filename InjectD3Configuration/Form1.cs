@@ -36,6 +36,7 @@ namespace InjectD3Configuration
     public partial class Form1 : Form
     {
         D3Configuration config = new D3Configuration();
+        Descent3Registry registry = new Descent3Registry();
         public Form1()
         {
             InitializeComponent();
@@ -70,6 +71,16 @@ namespace InjectD3Configuration
             catch (Exception exc)
             {
                 MessageBox.Show(string.Format("Failed to start InjectD3: {0}.", exc.Message));
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            D3ConfigWindow window = new D3ConfigWindow();
+            window.SetConfiguration(registry.GetConfig());
+            if (window.ShowDialog() == DialogResult.OK)
+            {
+                registry.SetConfig(window.GenerateConfiguration());
             }
         }
     }

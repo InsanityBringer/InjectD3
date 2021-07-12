@@ -29,6 +29,7 @@
 extern int PatchScreenMode;
 extern bool PatchMouseLibrary;
 extern bool PatchSoundSystem;
+extern bool PatchRegistryRoot;
 
 //Configuration switches
 extern bool ConfigForce32BitMode;
