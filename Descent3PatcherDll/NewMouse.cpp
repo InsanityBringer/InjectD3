@@ -120,7 +120,7 @@ void ddio_MouseMode(int mode)
 
 void ddio_MouseQueueFlush()
 {
-	memset(pDIM_buttons, 0, sizeof(pDIM_buttons));
+	memset(pDIM_buttons, 0, sizeof(*pDIM_buttons));
 	pMB_queue->flush();
 
 	//Need to clear the new arrays, since otherwise the game will think you're holding down a button when leaving a UI screen.
@@ -195,6 +195,7 @@ int RawInputHandler(HWND hWnd, unsigned int msg, unsigned int wParam, long lPara
 {
 	uint32_t buttons;
 	t_mse_event ev;
+	float curtime = timer_GetTime();
 
 	if (pDDIO_mouse_state->suspended) 
 	{
@@ -227,7 +228,7 @@ int RawInputHandler(HWND hWnd, unsigned int msg, unsigned int wParam, long lPara
 				{
 					pDIM_buttons->down_count[0]++;
 					pDIM_buttons->time_down[0] = GetTickCount();
-					localDownStart[0] = timer_GetTime();
+					localDownStart[0] = curtime;
 					pDIM_buttons->is_down[0] = true;
 					pDDIO_mouse_state->btn_flags |= MOUSE_LB;
 					ev.btn = 0;
@@ -243,7 +244,7 @@ int RawInputHandler(HWND hWnd, unsigned int msg, unsigned int wParam, long lPara
 					pDIM_buttons->up_count[0]++;
 					pDIM_buttons->is_down[0] = false;
 					pDIM_buttons->time_up[0] = GetTickCount();
-					localUpStart[0] = timer_GetTime();
+					localUpStart[0] = curtime;
 					pDDIO_mouse_state->btn_flags &= ~MOUSE_LB;
 					ev.btn = 0;
 					ev.state = false;
@@ -257,7 +258,7 @@ int RawInputHandler(HWND hWnd, unsigned int msg, unsigned int wParam, long lPara
 				{
 					pDIM_buttons->down_count[1]++;
 					pDIM_buttons->time_down[1] = GetTickCount();
-					localDownStart[1] = timer_GetTime();
+					localDownStart[1] = curtime;
 					pDIM_buttons->is_down[1] = true;
 					pDDIO_mouse_state->btn_flags |= MOUSE_RB;
 					ev.btn = 0;
@@ -269,7 +270,7 @@ int RawInputHandler(HWND hWnd, unsigned int msg, unsigned int wParam, long lPara
 					pDIM_buttons->up_count[1]++;
 					pDIM_buttons->is_down[1] = false;
 					pDIM_buttons->time_up[1] = GetTickCount();
-					localUpStart[1] = timer_GetTime();
+					localUpStart[1] = curtime;
 					pDDIO_mouse_state->btn_flags &= ~MOUSE_RB;
 					ev.btn = 0;
 					ev.state = false;
@@ -279,7 +280,7 @@ int RawInputHandler(HWND hWnd, unsigned int msg, unsigned int wParam, long lPara
 				{
 					pDIM_buttons->down_count[2]++;
 					pDIM_buttons->time_down[2] = GetTickCount();
-					localDownStart[2] = timer_GetTime();
+					localDownStart[2] = curtime;
 					pDIM_buttons->is_down[2] = true;
 					pDDIO_mouse_state->btn_flags |= MOUSE_CB;
 					ev.btn = 0;
@@ -291,7 +292,7 @@ int RawInputHandler(HWND hWnd, unsigned int msg, unsigned int wParam, long lPara
 					pDIM_buttons->up_count[2]++;
 					pDIM_buttons->is_down[2] = false;
 					pDIM_buttons->time_up[2] = GetTickCount();
-					localUpStart[2] = timer_GetTime();
+					localUpStart[2] = curtime;
 					pDDIO_mouse_state->btn_flags &= ~MOUSE_CB;
 					ev.btn = 0;
 					ev.state = false;
