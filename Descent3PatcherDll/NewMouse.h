@@ -54,3 +54,5 @@ struct mses_state
 
 bool InitNewMouse();
 float ddio_MouseBtnDownTime(int btn);
+void ddio_MouseQueueFlush();
+void ddio_MouseReset();

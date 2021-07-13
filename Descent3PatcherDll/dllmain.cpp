@@ -101,6 +101,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
                 CreateCallTo(GetPatchPoint(PatchPoint::InitMouseCall), (uintptr_t)&InitNewMouse);
                 //Thunk ddio_MouseBtnDownTime
                 CreateJmpTo(GetPatchPoint(PatchPoint::MouseBtnDownTimeThunk), (uintptr_t)&ddio_MouseBtnDownTime);
+                //Thunk ddio_MouseReset
+                CreateJmpTo(GetPatchPoint(PatchPoint::MouseResetThunk), (uintptr_t)&ddio_MouseQueueFlush);
             }
 
             //Windowed mode patch:

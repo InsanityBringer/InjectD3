@@ -118,6 +118,16 @@ void ddio_MouseMode(int mode)
 	pDDIO_mouse_state->mode = mode;
 }
 
+void ddio_MouseQueueFlush()
+{
+	memset(pDIM_buttons, 0, sizeof(pDIM_buttons));
+	pMB_queue->flush();
+
+	//Need to clear the new arrays, since otherwise the game will think you're holding down a button when leaving a UI screen.
+	memset(localDownStart, 0, sizeof(localDownStart));
+	memset(localUpStart, 0, sizeof(localUpStart));
+}
+
 void ddio_MouseReset()
 {
 	/*tWin32AppInfo appi;
@@ -144,7 +154,7 @@ void ddio_MouseReset()
 	pDDIO_mouse_state->y_aspect = 1.0f;
 
 	// reset button states
-	//ddio_MouseQueueFlush();
+	ddio_MouseQueueFlush();
 }
 
 // return mouse button down time.
@@ -166,6 +176,7 @@ float ddio_MouseBtnDownTime(int btn)
 	{
 		time = localUpStart[btn] - localDownStart[btn];
 		localUpStart[btn] = localDownStart[btn] = 0;
+		pDIM_buttons->time_down[btn] = pDIM_buttons->time_up[btn] = 0;
 	}
 
 	return time;
@@ -258,7 +269,7 @@ int RawInputHandler(HWND hWnd, unsigned int msg, unsigned int wParam, long lPara
 					pDIM_buttons->up_count[1]++;
 					pDIM_buttons->is_down[1] = false;
 					pDIM_buttons->time_up[1] = GetTickCount();
-					localUpStart[2] = timer_GetTime();
+					localUpStart[1] = timer_GetTime();
 					pDDIO_mouse_state->btn_flags &= ~MOUSE_RB;
 					ev.btn = 0;
 					ev.state = false;
@@ -268,7 +279,7 @@ int RawInputHandler(HWND hWnd, unsigned int msg, unsigned int wParam, long lPara
 				{
 					pDIM_buttons->down_count[2]++;
 					pDIM_buttons->time_down[2] = GetTickCount();
-					localDownStart[3] = timer_GetTime();
+					localDownStart[2] = timer_GetTime();
 					pDIM_buttons->is_down[2] = true;
 					pDDIO_mouse_state->btn_flags |= MOUSE_CB;
 					ev.btn = 0;
@@ -280,7 +291,7 @@ int RawInputHandler(HWND hWnd, unsigned int msg, unsigned int wParam, long lPara
 					pDIM_buttons->up_count[2]++;
 					pDIM_buttons->is_down[2] = false;
 					pDIM_buttons->time_up[2] = GetTickCount();
-					localUpStart[3] = timer_GetTime();
+					localUpStart[2] = timer_GetTime();
 					pDDIO_mouse_state->btn_flags &= ~MOUSE_CB;
 					ev.btn = 0;
 					ev.state = false;
