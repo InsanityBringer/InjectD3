@@ -385,7 +385,13 @@ int llsOpenAL::PlaySound3d(play_information* play_info, int sound_index, pos_sta
 
 void llsOpenAL::AdjustSound(int sound_uid, float f_volume, float f_pan, unsigned short frequency)
 {
+	int id = sound_uid & 255;
 	if (!Initalized) return;
+	if (!SoundEntries || id < 0 || id >= NumSoundChannels || SoundEntries[id].soundUID != sound_uid) return;
+
+	ALuint handle = SoundEntries[id].handle;
+	alSourcef(handle, AL_GAIN, f_volume);
+	//TODO: pan, frequency. Are these used?
 }
 
 void llsOpenAL::AdjustSound(int sound_uid, pos_state* cur_pos, float adjusted_volume, float reverb)
