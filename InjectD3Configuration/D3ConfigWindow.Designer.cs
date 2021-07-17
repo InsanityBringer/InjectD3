@@ -38,6 +38,7 @@
             this.KeyboardComboBox = new System.Windows.Forms.ComboBox();
             this.label3 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.DisableFindFastCheckBox = new System.Windows.Forms.CheckBox();
             this.label4 = new System.Windows.Forms.Label();
             this.InternetSpeedComboBox = new System.Windows.Forms.ComboBox();
             this.ConnectionComboBox = new System.Windows.Forms.ComboBox();
@@ -48,7 +49,6 @@
             this.RendererComboBox = new System.Windows.Forms.ComboBox();
             this.VSyncCheckBox = new System.Windows.Forms.CheckBox();
             this.ProfanityCheckBox = new System.Windows.Forms.CheckBox();
-            this.DisableFindFastCheckBox = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -166,6 +166,16 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Legacy Options";
             // 
+            // DisableFindFastCheckBox
+            // 
+            this.DisableFindFastCheckBox.AutoSize = true;
+            this.DisableFindFastCheckBox.Location = new System.Drawing.Point(6, 105);
+            this.DisableFindFastCheckBox.Name = "DisableFindFastCheckBox";
+            this.DisableFindFastCheckBox.Size = new System.Drawing.Size(104, 17);
+            this.DisableFindFastCheckBox.TabIndex = 16;
+            this.DisableFindFastCheckBox.Text = "Disable FindFast";
+            this.DisableFindFastCheckBox.UseVisualStyleBackColor = true;
+            // 
             // label4
             // 
             this.label4.AutoSize = true;
@@ -230,7 +240,8 @@
             "Low",
             "Medium",
             "High",
-            "Very High"});
+            "Very High",
+            "Custom"});
             this.DetailComboBox.Location = new System.Drawing.Point(15, 105);
             this.DetailComboBox.Name = "DetailComboBox";
             this.DetailComboBox.Size = new System.Drawing.Size(121, 21);
@@ -279,16 +290,6 @@
             this.ProfanityCheckBox.TabIndex = 18;
             this.ProfanityCheckBox.Text = "Filter profanity";
             this.ProfanityCheckBox.UseVisualStyleBackColor = true;
-            // 
-            // DisableFindFastCheckBox
-            // 
-            this.DisableFindFastCheckBox.AutoSize = true;
-            this.DisableFindFastCheckBox.Location = new System.Drawing.Point(6, 105);
-            this.DisableFindFastCheckBox.Name = "DisableFindFastCheckBox";
-            this.DisableFindFastCheckBox.Size = new System.Drawing.Size(104, 17);
-            this.DisableFindFastCheckBox.TabIndex = 16;
-            this.DisableFindFastCheckBox.Text = "Disable FindFast";
-            this.DisableFindFastCheckBox.UseVisualStyleBackColor = true;
             // 
             // D3ConfigWindow
             // 
