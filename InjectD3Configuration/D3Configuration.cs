@@ -58,6 +58,11 @@ namespace InjectD3Configuration
         [Description("Patches the DirectInput mouse code to a new raw input system. Vital for any of the new screen modes, but should also work in the original.")]
         [DefaultValue(true)]
         public bool PatchMouse { get; set; } = true;
+        [Category("Input")]
+        [DisplayName("Mouse prescalar")]
+        [Description("Scales mouse movement by this multiplier before being read by the game.")]
+        [DefaultValue(0.5f)]
+        public float MousePrescalar { get; set; } = 0.5f;
         [Category("Audio")]
         [DisplayName("OpenAL sound code")]
         [Description("Patches the sound code to use OpenAL. This can fix crackling sounds and results in more involved positional audio. This is experimental and possibly buggy at the moment, but should be usable.")]
@@ -94,6 +99,7 @@ namespace InjectD3Configuration
             StreamWriter sw = new StreamWriter(filename);
             sw.WriteLine("ScreenMode={0}", (int)ScreenMode);
             sw.WriteLine("NewMouse={0}", PatchMouse ? 1 : 0);
+            sw.WriteLine("MouseScalar={0}", MousePrescalar);
             sw.WriteLine("NewSoundSystem={0}", PatchSoundSystem ? 1 : 0);
             sw.WriteLine("NewSoundSystemReverbs={0}", UseReverbs ? 1 : 0);
             sw.WriteLine("Force32Bit={0}", Force32BitColor ? 1 : 0);
