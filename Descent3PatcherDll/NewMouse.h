@@ -32,6 +32,8 @@
 
 #define N_MSEBTNS		8
 
+extern float MouseScalar;
+
 struct mses_state
 {
 	void* lpdimse; //Useless
@@ -56,3 +58,4 @@ bool InitNewMouse();
 float ddio_MouseBtnDownTime(int btn);
 void ddio_MouseQueueFlush();
 void ddio_MouseReset();
+int ddio_MouseGetState(int* x, int* y, int* dx, int* dy, int* z, int* dz);

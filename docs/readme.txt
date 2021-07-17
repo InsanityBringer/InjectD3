@@ -95,6 +95,14 @@ Available patches:
 			InjectD3.cfg name: NewMouse
 			Valid values: 1.
 			
+		Mouse prescalar:
+			Prescales mouse input by the specified scalar. The default mouse values can be very extreme, and the Descent 3
+			configuration doesn't allow very precise control over mouse sensitivity, so this should make it easier to work
+			with. 
+			
+			InjectD3.cfg name: MouseScalar
+			Valid values: Any valid floating point value. 
+			
 	Audio patches:
 		OpenAL sound code:
 			Patches the original sound system with a new OpenAL based sound system. This option is currently very experimental,

@@ -37,6 +37,8 @@ bool handlerCalled = false;
 
 FILE* hack = nullptr;
 
+float MouseScalar = 0.5f;
+
 typedef struct t_mse_button_info
 {
 	bool is_down[N_MSEBTNS];
@@ -181,6 +183,31 @@ float ddio_MouseBtnDownTime(int btn)
 
 	return time;
 }
+
+//Mouse prescaling needs to be handled here, otherwise deltas frequently become 0 since they're very small individually (often 1), but come in large batches. 
+int ddio_MouseGetState(int* x, int* y, int* dx, int* dy, int* z, int* dz)
+{
+	//	update mouse timer.
+	int btn_mask = pDDIO_mouse_state->btn_mask;
+
+	pDDIO_mouse_state->timer = timer_GetTime();
+
+	//	get return values.
+	if (x) *x = pDDIO_mouse_state->x;
+	if (y) *y = pDDIO_mouse_state->y;
+	if (z) *z = pDDIO_mouse_state->z;
+	if (dx) *dx = (int)(pDDIO_mouse_state->dx * MouseScalar);
+	if (dy) *dy = (int)(pDDIO_mouse_state->dy * MouseScalar);
+	if (dz) *dz = pDDIO_mouse_state->dz;
+
+	pDDIO_mouse_state->dx = 0;
+	pDDIO_mouse_state->dy = 0;
+	pDDIO_mouse_state->dz = 0;
+	pDDIO_mouse_state->btn_mask = 0;
+
+	return btn_mask;
+}
+
 
 //-----------------------------------------------------------------------------
 // End Outrage-licensed code.

@@ -27,6 +27,7 @@
 
 #include "Win32App.h"
 #include "Configuration.h"
+#include "NewMouse.h"
 
 int PatchScreenMode = SCREENMODE_WINDOWED;
 bool PatchMouseLibrary = true;
@@ -69,9 +70,10 @@ ConfigEntry configList[] = {
 	{"DisplayNum", ConfigType::Integer, &DisplayNum},
 	{"FieldOfView", ConfigType::Float, &DefaultFov},
 	{"NewSoundSystemReverbs", ConfigType::Boolean, &ConfigUseReverbs},
-	{"UseUserRegistry", ConfigType::Boolean, &PatchRegistryRoot} };
+	{"UseUserRegistry", ConfigType::Boolean, &PatchRegistryRoot},
+	{"MouseScalar", ConfigType::Float, &MouseScalar} };
 
-#define CONFIGLISTSIZE (sizeof(configList) / sizeof(ConfigEntry))
+#define CONFIGLISTSIZE (sizeof(configList) / sizeof(*configList))
 
 //I apologize for how lazy this configuration parser is.
 void ParseConfig(const char* filename)

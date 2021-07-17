@@ -60,6 +60,7 @@ enum class PatchPoint
 	SoundLoadWaveFileFunc,
 	MouseBtnDownTimeThunk,
 	MouseResetThunk,
+	MouseGetStateThunk,
 
 	//variables
 	AppVar,
