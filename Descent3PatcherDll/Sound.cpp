@@ -167,7 +167,7 @@ int llsOpenAL::InitSoundLib(char mixer_type, oeWin32Application* sos, unsigned c
 			//Make the effect an EAX reverb
 			dalEffecti(EffectSlot, AL_EFFECT_TYPE, AL_EFFECT_EAXREVERB);
 			ALErrorCheck("Setting effect type");
-			SetGlobalReverbProperties(0.5, 0.3, 10.0); //These appear to be the default values Descent 3 uses.
+			SetGlobalReverbProperties(0.0, 0.0, 0.0);
 		}
 	}
 
