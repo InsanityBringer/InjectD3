@@ -43,7 +43,7 @@ float DefaultFov = 72.0f;
 bool AutoPatchOpenGL = false;
 bool AutoUseSubBuffer = false;
 
-
+bool AlwaysKatmai = false;
 
 //TODO: Ugh, doesn't this feel relatively crusty and ancient?
 enum class ConfigType
@@ -71,7 +71,8 @@ ConfigEntry configList[] = {
 	{"FieldOfView", ConfigType::Float, &DefaultFov},
 	{"NewSoundSystemReverbs", ConfigType::Boolean, &ConfigUseReverbs},
 	{"UseUserRegistry", ConfigType::Boolean, &PatchRegistryRoot},
-	{"MouseScalar", ConfigType::Float, &MouseScalar} };
+	{"MouseScalar", ConfigType::Float, &MouseScalar},
+	{"AlwaysKatmai", ConfigType::Boolean, &AlwaysKatmai} };
 
 #define CONFIGLISTSIZE (sizeof(configList) / sizeof(*configList))
 

@@ -151,6 +151,14 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
             //Patch init_level
             PatchMemory(GetPatchPoint(PatchPoint::ZoomInitLevel), (uint8_t*)&zoom, sizeof(zoom));
 
+            if (AlwaysKatmai)
+            {
+                //Patch check_system
+                PutLogInit(LogLevel::Info, "Forcing Katmai support.");
+                uint8_t good = 1;
+                PatchMemory(GetPatchPoint(PatchPoint::KatmaiDisable), &good, sizeof(good));
+            }
+
             if (PatchSoundSystem)
             {
                 //Sound system patch. This is the biggest hack on planet earth, and should never be done.

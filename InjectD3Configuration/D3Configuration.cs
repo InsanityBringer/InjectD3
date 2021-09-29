@@ -90,9 +90,14 @@ namespace InjectD3Configuration
         public int MultiSampleCount { get; set; } = 1;
         [Category("General")]
         [DisplayName("Use HKEY_CURRENT_USER")]
-        [Description("Makes the game store registry configuration in HKEY_CURRENT_USER, rather than HKEY_LOCAL_MACHINE. Makes config per-user and avoids needing adminstrator rights. ")]
+        [Description("Makes the game store registry configuration in HKEY_CURRENT_USER, rather than HKEY_LOCAL_MACHINE. Makes config per-user and avoids needing adminstrator rights.")]
         [DefaultValue(false)]
         public bool UseHKEYCurrentUser { get; set; } = false;
+        [Category("Graphics")]
+        [DisplayName("Always use SSE")]
+        [Description("Forces the use of SEE features, even on non-Intel processors. This enables features like powerup sparkles.")]
+        [DefaultValue(true)]
+        public bool AlwaysKatmai { get; set; } = true;
 
         public void WriteToFile(string filename)
         {
@@ -108,6 +113,7 @@ namespace InjectD3Configuration
             sw.WriteLine("DisplayNum={0}", DisplayNum);
             sw.WriteLine("FieldOfView={0}", DefaultFov.ToString("G", CultureInfo.InvariantCulture));
             sw.WriteLine("UseUserRegistry={0}", UseHKEYCurrentUser ? 1 : 0);
+            sw.WriteLine("AlwaysKatmai={0}", AlwaysKatmai ? 1 : 0);
 
             sw.Close();
             sw.Dispose();

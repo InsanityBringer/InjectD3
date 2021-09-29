@@ -46,6 +46,9 @@ extern int DisplayNum;
 //Stores the FOV to replace the default with.
 extern float DefaultFov;
 
+//Bypass Katmai checks and always use SSE features.
+extern bool AlwaysKatmai;
+
 //Not really configuration, but need it everywhere
 
 enum class LogLevel

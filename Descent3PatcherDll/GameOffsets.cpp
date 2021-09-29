@@ -85,6 +85,7 @@ bool InitPatchPoints(GameVersion ver)
 		PatchMap[PatchPoint::TimerGetTimeFunc] = 0x504900;
 		PatchMap[PatchPoint::MemMallocSubFunc] = 0x564230;
 		PatchMap[PatchPoint::RegistryRoot] = 0x555009;
+		PatchMap[PatchPoint::KatmaiDisable] = 0x4f7830;
 
 		//mouse things
 		PatchMap[PatchPoint::AppVar] = 0x63f15c;
@@ -165,6 +166,7 @@ bool InitPatchPoints(GameVersion ver)
 		PatchMap[PatchPoint::TimerGetTimeFunc] = 0x504bf0;
 		PatchMap[PatchPoint::MemMallocSubFunc] = 0x564580;
 		PatchMap[PatchPoint::RegistryRoot] = 0x555319;
+		PatchMap[PatchPoint::KatmaiDisable] = 0x04f7c40;
 
 		//mouse things
 		PatchMap[PatchPoint::AppVar] = 0x6383c4;

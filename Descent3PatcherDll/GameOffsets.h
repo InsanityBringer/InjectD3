@@ -53,6 +53,7 @@ enum class PatchPoint
 	ZoomDoRespawnZoomEffect,
 	ZoomInitLevel,
 	RegistryRoot,
+	KatmaiDisable,
 
 	//funcs
 	TimerGetTimeFunc,
