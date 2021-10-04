@@ -99,6 +99,77 @@ namespace InjectD3Configuration
         [DefaultValue(true)]
         public bool AlwaysKatmai { get; set; } = true;
 
+        public void ParseConfig(string filename)
+        {
+            StreamReader sr;
+            try
+            {
+                sr = new StreamReader(filename);
+            }
+            catch (FileNotFoundException)
+            {
+                return;
+            }
+            while (!sr.EndOfStream)
+            {
+                try
+                {
+                    string str = sr.ReadLine();
+
+                    if (str.Contains('='))
+                    {
+                        string[] parts = str.Split('=');
+                        //TODO: make better?
+                        switch (parts[0])
+                        {
+                            case "ScreenMode":
+                                ScreenMode = (ScreenModeType)int.Parse(parts[1]);
+                                break;
+                            case "NewMouse":
+                                PatchMouse = int.Parse(parts[1]) != 0;
+                                break;
+                            case "MouseScalar":
+                                MousePrescalar = float.Parse(parts[1]);
+                                break;
+                            case "NewSoundSystem":
+                                PatchSoundSystem = int.Parse(parts[1]) != 0;
+                                break;
+                            case "NewSoundSystemReverbs":
+                                UseReverbs = int.Parse(parts[1]) != 0;
+                                break;
+                            case "Force32Bit":
+                                Force32BitColor = int.Parse(parts[1]) != 0;
+                                break;
+                            case "ForceZ32":
+                                ForceZ32 = int.Parse(parts[1]) != 0;
+                                break;
+                            case "MultisampleCount":
+                                MultiSampleCount = int.Parse(parts[1]);
+                                break;
+                            case "DisplayNum":
+                                DisplayNum = int.Parse(parts[1]);
+                                break;
+                            case "FieldOfView":
+                                DefaultFov = float.Parse(parts[1]);
+                                break;
+                            case "UseUserRegistry":
+                                UseHKEYCurrentUser = int.Parse(parts[1]) != 0;
+                                break;
+                            case "AlwaysKatmai":
+                                AlwaysKatmai = int.Parse(parts[1]) != 0;
+                                break;
+                        }
+                    }
+                }
+                catch (Exception exc)
+                {
+                    sr.Close();
+                    throw exc;
+                }
+            }
+            sr.Close();
+        }
+
         public void WriteToFile(string filename)
         {
             StreamWriter sw = new StreamWriter(filename);

@@ -37,23 +37,28 @@ namespace InjectD3Configuration
     {
         D3Configuration config = new D3Configuration();
         Descent3Registry registry = new Descent3Registry();
+        bool hasChanges = false;
         public Form1()
         {
             InitializeComponent();
             propertyGrid1.SelectedObject = config;
+            try
+            {
+                config.ParseConfig("InjectD3.cfg");
+            }
+            catch (Exception exc)
+            {
+                StringBuilder msg = new StringBuilder();
+                msg.Append("Failed to parse config file! Using default settings.\n\nException message:\n\n");
+                msg.Append(exc.Message);
+                msg.Append("\n\nStack trace:\n\n");
+                msg.Append(exc.StackTrace);
+                MessageBox.Show(msg.ToString());
+            }
         }
 
         private void ExitButton_Click(object sender, EventArgs e)
         {
-            DialogResult res = MessageBox.Show("Do you want to save the current settings?", "", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
-            if (res == DialogResult.Yes)
-            {
-                config.WriteToFile("InjectD3.cfg");
-            }
-
-            if (res == DialogResult.Cancel)
-                return;
-
             Close();
         }
 
@@ -82,6 +87,26 @@ namespace InjectD3Configuration
             {
                 registry.SetConfig(window.GenerateConfiguration());
             }
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (hasChanges)
+            {
+                DialogResult res = MessageBox.Show("Do you want to save the current settings?", "", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+                if (res == DialogResult.Yes)
+                {
+                    config.WriteToFile("InjectD3.cfg");
+                }
+
+                if (res == DialogResult.Cancel)
+                    e.Cancel = true;
+            }
+        }
+
+        private void propertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
+        {
+            hasChanges = true;
         }
     }
 }
