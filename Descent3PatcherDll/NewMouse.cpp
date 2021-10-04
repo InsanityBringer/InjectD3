@@ -271,7 +271,7 @@ int RawInputHandler(HWND hWnd, unsigned int msg, unsigned int wParam, long lPara
 					pDIM_buttons->time_down[0] = GetTickCount();
 					localDownStart[0] = curtime;
 					pDIM_buttons->is_down[0] = true;
-					pDDIO_mouse_state->btn_flags |= MOUSE_LB;
+					pDDIO_mouse_state->btn_mask |= MOUSE_LB;
 					ev.btn = 0;
 					ev.state = true;
 					pMB_queue->send(ev);
@@ -286,7 +286,7 @@ int RawInputHandler(HWND hWnd, unsigned int msg, unsigned int wParam, long lPara
 					pDIM_buttons->is_down[0] = false;
 					pDIM_buttons->time_up[0] = GetTickCount();
 					localUpStart[0] = curtime;
-					pDDIO_mouse_state->btn_flags &= ~MOUSE_LB;
+					pDDIO_mouse_state->btn_mask &= ~MOUSE_LB;
 					ev.btn = 0;
 					ev.state = false;
 					pMB_queue->send(ev);
@@ -301,7 +301,7 @@ int RawInputHandler(HWND hWnd, unsigned int msg, unsigned int wParam, long lPara
 					pDIM_buttons->time_down[1] = GetTickCount();
 					localDownStart[1] = curtime;
 					pDIM_buttons->is_down[1] = true;
-					pDDIO_mouse_state->btn_flags |= MOUSE_RB;
+					pDDIO_mouse_state->btn_mask |= MOUSE_RB;
 					ev.btn = 1;
 					ev.state = true;
 					pMB_queue->send(ev);
@@ -312,7 +312,7 @@ int RawInputHandler(HWND hWnd, unsigned int msg, unsigned int wParam, long lPara
 					pDIM_buttons->is_down[1] = false;
 					pDIM_buttons->time_up[1] = GetTickCount();
 					localUpStart[1] = curtime;
-					pDDIO_mouse_state->btn_flags &= ~MOUSE_RB;
+					pDDIO_mouse_state->btn_mask &= ~MOUSE_RB;
 					ev.btn = 1;
 					ev.state = false;
 					pMB_queue->send(ev);
@@ -323,7 +323,7 @@ int RawInputHandler(HWND hWnd, unsigned int msg, unsigned int wParam, long lPara
 					pDIM_buttons->time_down[2] = GetTickCount();
 					localDownStart[2] = curtime;
 					pDIM_buttons->is_down[2] = true;
-					pDDIO_mouse_state->btn_flags |= MOUSE_CB;
+					pDDIO_mouse_state->btn_mask |= MOUSE_CB;
 					ev.btn = 2;
 					ev.state = true;
 					pMB_queue->send(ev);
@@ -334,7 +334,7 @@ int RawInputHandler(HWND hWnd, unsigned int msg, unsigned int wParam, long lPara
 					pDIM_buttons->is_down[2] = false;
 					pDIM_buttons->time_up[2] = GetTickCount();
 					localUpStart[2] = curtime;
-					pDDIO_mouse_state->btn_flags &= ~MOUSE_CB;
+					pDDIO_mouse_state->btn_mask &= ~MOUSE_CB;
 					ev.btn = 2;
 					ev.state = false;
 					pMB_queue->send(ev);
@@ -406,6 +406,7 @@ int RawInputHandler(HWND hWnd, unsigned int msg, unsigned int wParam, long lPara
 
 bool InitNewMouse()
 {
+	int i;
 	if (!rawInputOpened)
 	{
 		char buf[256];
@@ -495,6 +496,10 @@ bool InitNewMouse()
 		pDDIO_mouse_state->timer = timer_GetTime();
 		pDDIO_mouse_state->naxis = 2;
 		pDDIO_mouse_state->nbtns = N_DIMSEBTNS + 2; //always have a mousewheel
+		for (i = 0; i < pDDIO_mouse_state->nbtns; i++)
+		{
+			pDDIO_mouse_state->btn_flags |= (1 << i);
+		}
 		ddio_MouseMode(MOUSE_STANDARD_MODE);
 		ddio_MouseReset();
 
