@@ -85,6 +85,13 @@ Available patches:
 			InjectD3.cfg name: ScreenMode
 			Valid values: 0 for Original, 1 for Windowed, 2 for BorderlessFullscreen.
 			
+		Always use SSE: 
+			Forces the use of SSE features, and other Katmai only features. Among other things, this will enable motion blur
+			and powerup sparkles by default on AMD and other non-Intel systems.
+		
+			InjectD3.cfg name: AlwaysKatmai
+			Valid values: 0 or 1.
+			
 	Input patches:
 		New mouse library:
 			Enables new mouse code, using Windows's Raw Input APIs. Absolutely vital for windowed and borderless windowed modes
@@ -122,13 +129,14 @@ Available patches:
 Known bugs:
 
 	The following bugs are known and will be fixed in future versions, hopefully:
-		*The mouse doesn't work in briefings, but it will work in the automap.
 		*FMV sequences will still disrupt the screen resolution. 
 		*Dedicated server won't work when Windowed mode is patched. 
 		*Cockpit is unusable with widescreen resolutions.
 		*Borderless window is slightly hacky. Ah, if I had the patience I'd make an API on top of vulkan that isn't as low
 			level, but retains the much better context creation features to avoid Windows's OpenGL hacks.
-		*Sensitivity of the mouse in the menu system needs adjustment.
+		*Terrain system draw limits are made worse by the expanded FOV. Setting your terrain quality to 27 will fix issues
+			but reqires the minimum draw distance. To increase the draw distance ATM will involve finding a balance of quality
+			and render distance. I hope to patch this in the future, but it is a nontrivial fix. 
 			
 Future patches:
 
