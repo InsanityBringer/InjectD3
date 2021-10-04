@@ -69,6 +69,8 @@ float localUpStart[N_MSEBTNS];
 #define MSEBTN_WHL_UP	(N_DIMSEBTNS)		// button index for mouse wheel up
 #define MSEBTN_WHL_DOWN	(N_DIMSEBTNS+1)	// button index for mouse wheel down
 
+int wheelAccum = 0;
+
 // taken from winuser.h
 #ifndef WHEEL_DELTA
 #define WHEEL_DELTA	120
@@ -181,6 +183,9 @@ float ddio_MouseBtnDownTime(int btn)
 		pDIM_buttons->time_down[btn] = pDIM_buttons->time_up[btn] = 0;
 	}
 
+	pDIM_buttons->is_down[MSEBTN_WHL_UP] = false;
+	pDIM_buttons->is_down[MSEBTN_WHL_DOWN] = false;
+
 	return time;
 }
 
@@ -204,6 +209,9 @@ int ddio_MouseGetState(int* x, int* y, int* dx, int* dy, int* z, int* dz)
 	pDDIO_mouse_state->dy = 0;
 	pDDIO_mouse_state->dz = 0;
 	pDDIO_mouse_state->btn_mask = 0;
+
+	pDIM_buttons->is_down[MSEBTN_WHL_UP] = false;
+	pDIM_buttons->is_down[MSEBTN_WHL_DOWN] = false;
 
 	return btn_mask;
 }
@@ -324,6 +332,33 @@ int RawInputHandler(HWND hWnd, unsigned int msg, unsigned int wParam, long lPara
 					ev.btn = 0;
 					ev.state = false;
 					pMB_queue->send(ev);
+				}
+
+				if (buttons & RI_MOUSE_WHEEL)
+				{
+					wheelAccum += (int)(short)rawinput->data.mouse.usButtonData;
+					if (wheelAccum >= WHEEL_DELTA)
+					{
+						pDIM_buttons->down_count[MSEBTN_WHL_UP]++;
+						pDIM_buttons->up_count[MSEBTN_WHL_UP]++;
+						pDIM_buttons->is_down[MSEBTN_WHL_UP] = true;
+						pDIM_buttons->time_down[MSEBTN_WHL_UP] = GetTickCount();
+						pDIM_buttons->time_up[MSEBTN_WHL_UP] = GetTickCount()+100;
+						localDownStart[MSEBTN_WHL_UP] = curtime;
+						localUpStart[MSEBTN_WHL_UP] = curtime+.1f;
+						wheelAccum = 0;
+					}
+					else if (wheelAccum <= -WHEEL_DELTA)
+					{
+						pDIM_buttons->down_count[MSEBTN_WHL_DOWN]++;
+						pDIM_buttons->up_count[MSEBTN_WHL_DOWN]++;
+						pDIM_buttons->is_down[MSEBTN_WHL_DOWN] = true;
+						pDIM_buttons->time_down[MSEBTN_WHL_DOWN] = GetTickCount();
+						pDIM_buttons->time_up[MSEBTN_WHL_DOWN] = GetTickCount()+100;
+						localDownStart[MSEBTN_WHL_DOWN] = curtime;
+						localUpStart[MSEBTN_WHL_DOWN] = curtime+.1f;
+						wheelAccum = 0;
+					}
 				}
 
 				pDDIO_mouse_state->dx += rawinput->data.mouse.lLastX;
@@ -451,7 +486,7 @@ bool InitNewMouse()
 		pDDIO_mouse_state->suspended = false;
 		pDDIO_mouse_state->timer = timer_GetTime();
 		pDDIO_mouse_state->naxis = 2;
-		pDDIO_mouse_state->nbtns = 3;
+		pDDIO_mouse_state->nbtns = N_DIMSEBTNS + 2; //always have a mousewheel
 		ddio_MouseMode(MOUSE_STANDARD_MODE);
 		ddio_MouseReset();
 
