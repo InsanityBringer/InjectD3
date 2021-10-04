@@ -71,6 +71,9 @@ float localUpStart[N_MSEBTNS];
 
 int wheelAccum = 0;
 
+//These are needed to keep the mouse smooth in UIs
+float xCoord, yCoord;
+
 // taken from winuser.h
 #ifndef WHEEL_DELTA
 #define WHEEL_DELTA	120
@@ -156,6 +159,9 @@ void ddio_MouseReset()
 	pDDIO_mouse_state->cz = 0;
 	pDDIO_mouse_state->x_aspect = 1.0f;
 	pDDIO_mouse_state->y_aspect = 1.0f;
+
+	xCoord = pDDIO_mouse_state->x;
+	yCoord = pDDIO_mouse_state->y;
 
 	// reset button states
 	ddio_MouseQueueFlush();
@@ -296,7 +302,7 @@ int RawInputHandler(HWND hWnd, unsigned int msg, unsigned int wParam, long lPara
 					localDownStart[1] = curtime;
 					pDIM_buttons->is_down[1] = true;
 					pDDIO_mouse_state->btn_flags |= MOUSE_RB;
-					ev.btn = 0;
+					ev.btn = 1;
 					ev.state = true;
 					pMB_queue->send(ev);
 				}
@@ -307,7 +313,7 @@ int RawInputHandler(HWND hWnd, unsigned int msg, unsigned int wParam, long lPara
 					pDIM_buttons->time_up[1] = GetTickCount();
 					localUpStart[1] = curtime;
 					pDDIO_mouse_state->btn_flags &= ~MOUSE_RB;
-					ev.btn = 0;
+					ev.btn = 1;
 					ev.state = false;
 					pMB_queue->send(ev);
 				}
@@ -318,7 +324,7 @@ int RawInputHandler(HWND hWnd, unsigned int msg, unsigned int wParam, long lPara
 					localDownStart[2] = curtime;
 					pDIM_buttons->is_down[2] = true;
 					pDDIO_mouse_state->btn_flags |= MOUSE_CB;
-					ev.btn = 0;
+					ev.btn = 2;
 					ev.state = true;
 					pMB_queue->send(ev);
 				}
@@ -329,7 +335,7 @@ int RawInputHandler(HWND hWnd, unsigned int msg, unsigned int wParam, long lPara
 					pDIM_buttons->time_up[2] = GetTickCount();
 					localUpStart[2] = curtime;
 					pDDIO_mouse_state->btn_flags &= ~MOUSE_CB;
-					ev.btn = 0;
+					ev.btn = 2;
 					ev.state = false;
 					pMB_queue->send(ev);
 				}
@@ -369,20 +375,22 @@ int RawInputHandler(HWND hWnd, unsigned int msg, unsigned int wParam, long lPara
 			//if (pDDIO_mouse_state->mode == MOUSE_STANDARD_MODE) 
 			{
 				// if in standard mode, don't use x,y,z retreived from dimouse_GetDeviceData
+				xCoord += (float)rawinput->data.mouse.lLastX;
+				yCoord += (float)rawinput->data.mouse.lLastY;
 
-				pDDIO_mouse_state->x += (pDDIO_mouse_state->dx >> 2); //The default values are way too extreme in my experience
-				pDDIO_mouse_state->y += (pDDIO_mouse_state->dy >> 2);
+				pDDIO_mouse_state->x = (int)xCoord;
+				pDDIO_mouse_state->y = (int)yCoord;
 				pDDIO_mouse_state->z = 0;
 
 				//	check bounds of mouse cursor.
 				if (pDDIO_mouse_state->x < pDDIO_mouse_state->brect.left)
-					pDDIO_mouse_state->x = (short)pDDIO_mouse_state->brect.left;
+					xCoord = pDDIO_mouse_state->x = (short)pDDIO_mouse_state->brect.left;
 				if (pDDIO_mouse_state->x >= pDDIO_mouse_state->brect.right)
-					pDDIO_mouse_state->x = (short)pDDIO_mouse_state->brect.right - 1;
+					xCoord = pDDIO_mouse_state->x = (short)pDDIO_mouse_state->brect.right - 1;
 				if (pDDIO_mouse_state->y < pDDIO_mouse_state->brect.top)
-					pDDIO_mouse_state->y = (short)pDDIO_mouse_state->brect.top;
+					yCoord = pDDIO_mouse_state->y = (short)pDDIO_mouse_state->brect.top;
 				if (pDDIO_mouse_state->y >= pDDIO_mouse_state->brect.bottom)
-					pDDIO_mouse_state->y = (short)pDDIO_mouse_state->brect.bottom - 1;
+					yCoord = pDDIO_mouse_state->y = (short)pDDIO_mouse_state->brect.bottom - 1;
 				if (pDDIO_mouse_state->z > pDDIO_mouse_state->zmax)
 					pDDIO_mouse_state->z = (short)pDDIO_mouse_state->zmax;
 				if (pDDIO_mouse_state->z < pDDIO_mouse_state->zmin)
