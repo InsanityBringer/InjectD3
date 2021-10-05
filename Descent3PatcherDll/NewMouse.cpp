@@ -22,6 +22,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "Win32App.h"
 #include "NewMouse.h"
@@ -207,8 +208,10 @@ int ddio_MouseGetState(int* x, int* y, int* dx, int* dy, int* z, int* dz)
 	if (x) *x = pDDIO_mouse_state->x;
 	if (y) *y = pDDIO_mouse_state->y;
 	if (z) *z = pDDIO_mouse_state->z;
-	if (dx) *dx = (int)(pDDIO_mouse_state->dx * MouseScalar);
-	if (dy) *dy = (int)(pDDIO_mouse_state->dy * MouseScalar);
+	//TODO: Is there a cleaner way of doing this?
+	//This hack fixes low prescalars causing a "dead zone" where small motions weren't picked up. 
+	if (dx) *dx = (int)ceil(abs(pDDIO_mouse_state->dx) * (double)MouseScalar) * (pDDIO_mouse_state->dx < 0 ? -1 : 1);
+	if (dy) *dy = (int)ceil(abs(pDDIO_mouse_state->dy) * (double)MouseScalar) * (pDDIO_mouse_state->dy < 0 ? -1 : 1);
 	if (dz) *dz = pDDIO_mouse_state->dz;
 
 	pDDIO_mouse_state->dx = 0;
