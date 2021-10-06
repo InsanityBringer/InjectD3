@@ -49,6 +49,7 @@ namespace InjectD3Configuration
             config.ProfanityPrevention = ProfanityCheckBox.Checked;
             config.RSVsync = VSyncCheckBox.Checked;
             config.SoundMixer = 1;
+            config.CommandLine = "";
 
             return config;
         }

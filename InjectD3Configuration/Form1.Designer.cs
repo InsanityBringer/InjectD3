@@ -50,9 +50,9 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(9, 484);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(273, 13);
+            this.label1.Size = new System.Drawing.Size(372, 13);
             this.label1.TabIndex = 1;
-            this.label1.Text = "Additional command line parameters (for this launch only)";
+            this.label1.Text = "Additional command line parameters (when launched from the config program)";
             // 
             // textBox1
             // 
@@ -60,6 +60,7 @@
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(460, 20);
             this.textBox1.TabIndex = 2;
+            this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
             // LaunchButton
             // 

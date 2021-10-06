@@ -55,6 +55,8 @@ namespace InjectD3Configuration
                 msg.Append(exc.StackTrace);
                 MessageBox.Show(msg.ToString());
             }
+            Descent3RegistryConfig registryConfig = registry.GetConfig();
+            textBox1.Text = registryConfig.CommandLine;
         }
 
         private void ExitButton_Click(object sender, EventArgs e)
@@ -85,7 +87,9 @@ namespace InjectD3Configuration
             window.SetConfiguration(registry.GetConfig());
             if (window.ShowDialog() == DialogResult.OK)
             {
-                registry.SetConfig(window.GenerateConfiguration());
+                Descent3RegistryConfig newConfig = window.GenerateConfiguration();
+                newConfig.CommandLine = textBox1.Text;
+                registry.SetConfig(newConfig);
             }
         }
 
@@ -97,6 +101,9 @@ namespace InjectD3Configuration
                 if (res == DialogResult.Yes)
                 {
                     config.WriteToFile("InjectD3.cfg");
+                    Descent3RegistryConfig registryConfig = registry.GetConfig();
+                    registryConfig.CommandLine = textBox1.Text;
+                    registry.SetConfig(registryConfig);
                 }
 
                 if (res == DialogResult.Cancel)
@@ -105,6 +112,11 @@ namespace InjectD3Configuration
         }
 
         private void propertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
+        {
+            hasChanges = true;
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
         {
             hasChanges = true;
         }

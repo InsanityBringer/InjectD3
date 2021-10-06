@@ -8,6 +8,7 @@ namespace InjectD3Configuration
 {
     public struct Descent3RegistryConfig
     {
+        public string CommandLine;
         public string ConnectionSpeed;
         public bool EnableCHFlight;
         public bool EnableJoystickFF;
@@ -61,6 +62,7 @@ namespace InjectD3Configuration
             Descent3Key.SetValue("ProfanityPrevention", 0);
             Descent3Key.SetValue("RS_vsync", 0);
             Descent3Key.SetValue("SoundMixer", 1);
+            Descent3Key.SetValue("CommandLine", "");
         }
 
         public Descent3RegistryConfig GetConfig()
@@ -73,12 +75,13 @@ namespace InjectD3Configuration
             config.FindFastDisable = (int)Descent3Key.GetValue("FindFastDiable", 1) == 1;
             config.KeyboardType = (string)Descent3Key.GetValue("KeyboardType", "United States");
             config.LanguageType = (int)Descent3Key.GetValue("LanguageType", 0);
-            config.NetworkConnection = (string)Descent3Key.GetValue("KeyboardType", "LAN");
+            config.NetworkConnection = (string)Descent3Key.GetValue("NetworkConnection", "LAN");
             config.PredefDetailSetting = (int)Descent3Key.GetValue("PredefDetailSetting", 3);
             config.PreferredRenderer = (int)Descent3Key.GetValue("PreferredRenderer", 2);
             config.ProfanityPrevention = (int)Descent3Key.GetValue("ProfanityPrevention", 1) == 1;
             config.RSVsync = (int)Descent3Key.GetValue("RS_vsync", 1) == 1;
             config.SoundMixer = (int)Descent3Key.GetValue("SoundMixer", 1);
+            config.CommandLine = (string)Descent3Key.GetValue("CommandLine", "");
 
             return config;
         }
@@ -98,6 +101,7 @@ namespace InjectD3Configuration
             Descent3Key.SetValue("ProfanityPrevention", config.ProfanityPrevention ? 1 : 0);
             Descent3Key.SetValue("RS_vsync", config.RSVsync ? 1 : 0);
             Descent3Key.SetValue("SoundMixer", config.SoundMixer);
+            Descent3Key.SetValue("CommandLine", config.CommandLine);
         }
     }
 }
