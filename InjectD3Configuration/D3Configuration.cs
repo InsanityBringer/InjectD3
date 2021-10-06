@@ -129,7 +129,7 @@ namespace InjectD3Configuration
                                 PatchMouse = int.Parse(parts[1]) != 0;
                                 break;
                             case "MouseScalar":
-                                MousePrescalar = float.Parse(parts[1]);
+                                MousePrescalar = float.Parse(parts[1], CultureInfo.InvariantCulture.NumberFormat);
                                 break;
                             case "NewSoundSystem":
                                 PatchSoundSystem = int.Parse(parts[1]) != 0;
@@ -150,7 +150,7 @@ namespace InjectD3Configuration
                                 DisplayNum = int.Parse(parts[1]);
                                 break;
                             case "FieldOfView":
-                                DefaultFov = float.Parse(parts[1]);
+                                DefaultFov = float.Parse(parts[1], CultureInfo.InvariantCulture.NumberFormat);
                                 break;
                             case "UseUserRegistry":
                                 UseHKEYCurrentUser = int.Parse(parts[1]) != 0;
