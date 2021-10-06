@@ -175,7 +175,7 @@ namespace InjectD3Configuration
             StreamWriter sw = new StreamWriter(filename);
             sw.WriteLine("ScreenMode={0}", (int)ScreenMode);
             sw.WriteLine("NewMouse={0}", PatchMouse ? 1 : 0);
-            sw.WriteLine("MouseScalar={0}", MousePrescalar);
+            sw.WriteLine("MouseScalar={0}", MousePrescalar.ToString("G", CultureInfo.InvariantCulture));
             sw.WriteLine("NewSoundSystem={0}", PatchSoundSystem ? 1 : 0);
             sw.WriteLine("NewSoundSystemReverbs={0}", UseReverbs ? 1 : 0);
             sw.WriteLine("Force32Bit={0}", Force32BitColor ? 1 : 0);
