@@ -231,6 +231,7 @@ char llsOpenAL::GetSoundMixer(void)
 
 int llsOpenAL::PlaySound2d(play_information* play_info, int sound_index, float volume, float pan, bool f_looped)
 {
+	ALErrorCheck("Clearing entry error in play sound 2d.");
 	if (!Initalized) return -1;
 	if (pSoundFiles[pSounds[sound_index].sample_index].used == 0) return -1;
 	short sound_uid = FindSoundSlot(volume, play_info->priority);
@@ -273,6 +274,7 @@ int llsOpenAL::PlaySound2d(play_information* play_info, int sound_index, float v
 
 int llsOpenAL::PlayStream(play_information* play_info)
 {
+	ALErrorCheck("Clearing entry error in play stream.");
 	float peakVolume = max(play_info->left_volume, play_info->right_volume);
 	if (!Initalized) return -1;
 	short sound_uid = FindSoundSlot(peakVolume, play_info->priority);
@@ -326,6 +328,7 @@ int llsOpenAL::PlayStream(play_information* play_info)
 
 void llsOpenAL::SetListener(pos_state* cur_pos)
 {
+	ALErrorCheck("Clearing entry error in listener properties.");
 	//PutLog(LogLevel::Info, "Setting listener.");
 	ListenerOrient = *cur_pos->orient;
 	ListenerPosition = *cur_pos->position;
@@ -337,13 +340,16 @@ void llsOpenAL::SetListener(pos_state* cur_pos)
 	buf[0] = -ListenerOrient.fvec.x; buf[1] = ListenerOrient.fvec.y; buf[2] = ListenerOrient.fvec.z;
 	buf[3] = -ListenerOrient.uvec.x; buf[4] = ListenerOrient.uvec.y; buf[5] = ListenerOrient.uvec.z;
 	alListener3f(AL_POSITION, -ListenerPosition.x, ListenerPosition.y, ListenerPosition.z);
+	ALErrorCheck("Updating listener position");
 	alListener3f(AL_VELOCITY, -ListenerVelocty.x, ListenerVelocty.y, ListenerVelocty.z);
+	ALErrorCheck("Updating listener velocity");
 	alListenerfv(AL_ORIENTATION, (const ALfloat*)&buf);
-	ALErrorCheck("Updating listener");
+	ALErrorCheck("Updating listener orientation");
 }
 
 int llsOpenAL::PlaySound3d(play_information* play_info, int sound_index, pos_state* cur_pos, float master_volume, bool f_looped, float reverb)
 {
+	ALErrorCheck("Clearing entry error in play sound 3d.");
 	if (!Initalized) return -1;
 	if (pSoundFiles[pSounds[sound_index].sample_index].used == 0) return -1;
 	short sound_uid = FindSoundSlot(master_volume, play_info->priority);
@@ -385,26 +391,34 @@ int llsOpenAL::PlaySound3d(play_information* play_info, int sound_index, pos_sta
 
 void llsOpenAL::AdjustSound(int sound_uid, float f_volume, float f_pan, unsigned short frequency)
 {
+	ALErrorCheck("Clearing entry error in adjust volume.");
 	int id = sound_uid & 255;
 	if (!Initalized) return;
 	if (!SoundEntries || id < 0 || id >= NumSoundChannels || SoundEntries[id].soundUID != sound_uid) return;
 
 	ALuint handle = SoundEntries[id].handle;
 	alSourcef(handle, AL_GAIN, f_volume);
+	ALErrorCheck("Adjusting sound volume.");
 	//TODO: pan, frequency. Are these used?
 }
 
 void llsOpenAL::AdjustSound(int sound_uid, pos_state* cur_pos, float adjusted_volume, float reverb)
 {
+	ALErrorCheck("Clearing entry error in adjust sound.");
 	int id = sound_uid & 255;
 	if (!Initalized) return;
-	if (!SoundEntries || id < 0 || id >= NumSoundChannels || SoundEntries[id].soundUID != sound_uid) return;
+	//gotta trap nans because apparently sometimes objects exist at undefined locations nice
+	if (!SoundEntries || id < 0 || id >= NumSoundChannels || SoundEntries[id].soundUID != sound_uid || isnan<float>(cur_pos->position->x)) return;
 
 	ALuint handle = SoundEntries[id].handle;
 	alSource3f(handle, AL_DIRECTION, -cur_pos->orient->fvec.x, cur_pos->orient->fvec.y, cur_pos->orient->fvec.z);
+	ALErrorCheck("Adjusting sound direction.");
 	alSource3f(handle, AL_VELOCITY, -cur_pos->velocity->x, cur_pos->velocity->y, cur_pos->velocity->z);
 	alSource3f(handle, AL_POSITION, -cur_pos->position->x, cur_pos->position->y, cur_pos->position->z);
+	if (ALErrorCheck("Adjusting sound position."))
+		PutLog(LogLevel::Info, "\t(%f %f %f) (%f %f %f)", -cur_pos->velocity->x, cur_pos->velocity->y, cur_pos->velocity->z, -cur_pos->position->x, cur_pos->position->y, cur_pos->position->z);
 	alSourcef(handle, AL_GAIN, adjusted_volume * pSounds[SoundEntries[id].soundNum].import_volume);
+	ALErrorCheck("Adjusting sound gain.");
 }
 
 void llsOpenAL::StopAllSounds(void)
@@ -438,6 +452,7 @@ int llsOpenAL::IsSoundPlaying(int sound_index)
 
 void llsOpenAL::StopSound(int sound_uid, unsigned char f_immediately)
 {
+	ALErrorCheck("Clearing entry error in stop sound.");
 	int id = sound_uid & 255;
 	if (!Initalized) return;
 	if (!SoundEntries || id < 0 || id >= NumSoundChannels || SoundEntries[id].soundUID != sound_uid) return;
@@ -526,6 +541,8 @@ void llsOpenAL::SoundStartFrame(void)
 {
 	if (!Initalized) return;
 
+	ALErrorCheck("Clearing entry error in sound system frame start");
+
 	//Service streams
 	for (int i = 0; i < NumSoundChannels; i++)
 	{
@@ -544,6 +561,8 @@ void llsOpenAL::SoundEndFrame(void)
 	int i;
 	ALint state;
 
+	ALErrorCheck("Clearing entry error in sound system frame.");
+
 	//PutLog(LogLevel::Info, "Ending sound system frame");
 
 	//Free buffers and update playing state of all current sounds.
@@ -555,12 +574,12 @@ void llsOpenAL::SoundEndFrame(void)
 			//	ServiceStream(i);
 
 			alGetSourcei(SoundEntries[i].handle, AL_SOURCE_STATE, &state);
-			if (state == AL_STOPPED)
+			if (state == AL_STOPPED && !SoundEntries[i].streaming)
 			{
 				SoundCleanup(i);
-				//PutLog(LogLevel::Info, "Sound %d (%s) has been stopped", SoundEntries[i].soundUID, pSoundFiles[pSounds[SoundEntries[i].soundNum].sample_index].name);
+				//PutLog(LogLevel::Info, "Sound %d has been stopped", SoundEntries[i].soundUID);
 			}
-			else if (state == AL_PLAYING)
+			else if (state == AL_PLAYING || SoundEntries[i].streaming)
 			{
 				SoundEntries[i].info->m_ticks++;
 			}
@@ -570,6 +589,7 @@ void llsOpenAL::SoundEndFrame(void)
 
 bool llsOpenAL::SetGlobalReverbProperties(float volume, float damping, float decay)
 {
+	ALErrorCheck("Clearing entry error in reverb properties.");
 	if (!EffectsSupported)
 		return false;
 
@@ -730,6 +750,7 @@ short llsOpenAL::FindSoundSlot(float volume, int priority)
 
 void llsOpenAL::InitSource2D(uint32_t handle, sound_info* soundInfo, float volume)
 {
+	ALErrorCheck("Clearing entry error in 2d source properties.");
 	alSourcei(handle, AL_SOURCE_RELATIVE, AL_TRUE); //should glue source to listener pos
 	alSourcef(handle, AL_ROLLOFF_FACTOR, 0.0f);
 	alSource3f(handle, AL_DIRECTION, 0.f, 0.f, 0.f);
@@ -748,6 +769,7 @@ void llsOpenAL::InitSource2D(uint32_t handle, sound_info* soundInfo, float volum
 
 void llsOpenAL::InitSourceStreaming(uint32_t handle, float volume)
 {
+	ALErrorCheck("Clearing entry error in streaming source properties.");
 	alSourcei(handle, AL_SOURCE_RELATIVE, AL_TRUE); //should glue source to listener pos
 	alSourcef(handle, AL_ROLLOFF_FACTOR, 0.0f);
 	alSource3f(handle, AL_DIRECTION, 0.f, 0.f, 0.f);
@@ -766,13 +788,16 @@ void llsOpenAL::InitSourceStreaming(uint32_t handle, float volume)
 
 void llsOpenAL::InitSource3D(uint32_t handle, sound_info* soundInfo, pos_state* posInfo, float volume)
 {
+	ALErrorCheck("Clearing entry error in 3d source properties.");
 	alSourcei(handle, AL_SOURCE_RELATIVE, AL_FALSE);
 	alSourcef(handle, AL_ROLLOFF_FACTOR, 1.0f);
 	alSource3f(handle, AL_DIRECTION, -posInfo->orient->fvec.x, posInfo->orient->fvec.y, posInfo->orient->fvec.z);
 	alSource3f(handle, AL_VELOCITY, -posInfo->velocity->x, posInfo->velocity->y, posInfo->velocity->z);
 	alSource3f(handle, AL_POSITION, -posInfo->position->x, posInfo->position->y, posInfo->position->z);
+	ALErrorCheck("Setting 3D sound source position.");
 	alSourcef(handle, AL_MAX_GAIN, 1.f);
 	alSourcef(handle, AL_GAIN, volume * soundInfo->import_volume);
+	ALErrorCheck("Setting 3D sound source volume.");
 	alSourcef(handle, AL_PITCH, 1.f);
 	alSourcef(handle, AL_DOPPLER_FACTOR, 0.6f);
 
@@ -783,6 +808,7 @@ void llsOpenAL::InitSource3D(uint32_t handle, sound_info* soundInfo, pos_state* 
 		alSourcef(handle, AL_CONE_OUTER_GAIN, soundInfo->outer_cone_volume);
 		alSourcef(handle, AL_CONE_INNER_ANGLE, soundInfo->inner_cone_angle);
 		alSourcef(handle, AL_CONE_OUTER_ANGLE, soundInfo->outer_cone_angle);
+		ALErrorCheck("Setting 3D sound source count.");
 	}
 	else
 	{
@@ -792,11 +818,13 @@ void llsOpenAL::InitSource3D(uint32_t handle, sound_info* soundInfo, pos_state* 
 
 	alSourcef(handle, AL_REFERENCE_DISTANCE, soundInfo->min_distance);
 	alSourcef(handle, AL_MAX_DISTANCE, soundInfo->max_distance);
+	ALErrorCheck("Setting 3D sound source distance.");
 
 	alSourcei(handle, AL_LOOPING, AL_FALSE);
 
 	if (EffectsSupported)
 		alSource3i(handle, AL_AUXILIARY_SEND_FILTER, AuxEffectSlot, 0, NULL);
+	ALErrorCheck("Setting 3D sound source effect.");
 }
 
 void llsOpenAL::BindBufferData(uint32_t handle, int sound_index, bool looped)
@@ -905,7 +933,8 @@ void llsOpenAL::ServiceStream(int soundID)
 		}
 
 		alSourceUnqueueBuffers(SoundEntries[soundID].handle, numProcessedBuffers, dequeueList);
-		//PutLog(LogLevel::Info, "%d buffers dequeued. [%d %d %d]", numProcessedBuffers, SoundEntries[soundID].bufferQueue[0], SoundEntries[soundID].bufferQueue[1], SoundEntries[soundID].bufferQueue[2]);
+		//alGetSourcei(SoundEntries[soundID].handle, AL_BUFFERS_QUEUED, &numQueuedBuffers);
+		//PutLog(LogLevel::Info, "%d buffers dequeued. %d currently queued. [%d %d %d]", numProcessedBuffers, numQueuedBuffers, SoundEntries[soundID].bufferQueue[0], SoundEntries[soundID].bufferQueue[1], SoundEntries[soundID].bufferQueue[2]);
 	}
 	ALErrorCheck("Dequeueing buffers");
 
@@ -914,7 +943,7 @@ void llsOpenAL::ServiceStream(int soundID)
 	if (numQueuedBuffers < NUM_STREAMING_BUFFERS) //queue up a new one
 	{
 		int newSlot = 0;
-		int size = SoundEntries[soundID].info->m_stream_bufsize;
+		int size = SoundEntries[soundID].info->m_stream_size;
 		void* data;
 		//Find first slot that's available
 		for (i = 0; i < NUM_STREAMING_BUFFERS; i++)
@@ -926,17 +955,18 @@ void llsOpenAL::ServiceStream(int soundID)
 			}
 		}
 
-		SoundEntries[soundID].info->m_samples_played += SoundEntries[soundID].info->m_stream_bufsize;
-
 		//Get available data and queue it
 		data = SoundEntries[soundID].info->m_stream_cback(SoundEntries[soundID].info->user_data, SoundEntries[soundID].info->m_stream_handle, &size);
 
-		SoundEntries[soundID].info->m_stream_bufsize = size;
+		SoundEntries[soundID].info->m_stream_size = size;
 		SoundEntries[soundID].info->m_stream_data = data;
 
 		if (!data)
 		{
 			//PutLog(LogLevel::Error, "Tried to queue streaming buffer, but got nullptr.");
+			SoundEntries[soundID].info->m_stream_size = 0;
+			//When this occurs, the stream needs to terminate, the streaming service will then start a new stream. 
+			SoundCleanup(soundID);
 			return;
 		}
 
@@ -949,11 +979,20 @@ void llsOpenAL::ServiceStream(int soundID)
 			SoundEntries[soundID].bufferStatus[newSlot] = true;
 			ALErrorCheck("Queueing buffer");
 
+
+			SoundEntries[soundID].info->m_samples_played += size;
 			//PutLog(LogLevel::Info, "Buffer queued to %d.", newSlot);
 		}
 		else
 		{
-			//PutLog(LogLevel::Info, "Slots available to queue but callback returned no bytes.");
+			PutLog(LogLevel::Info, "Slots available to queue but callback returned no bytes.");
+		}
+
+		ALint state;
+		alGetSourcei(SoundEntries[soundID].handle, AL_SOURCE_STATE, &state);
+		if (state != AL_PLAYING)
+		{
+			alSourcePlay(SoundEntries[soundID].handle);
 		}
 	}
 }
