@@ -284,7 +284,7 @@ int llsOpenAL::PlayStream(play_information* play_info)
 	InitSourceStreaming(SoundEntries[sound_uid].handle, peakVolume);
 
 	//Generate buffers
-	alGenBuffers(4, SoundEntries[sound_uid].bufferHandles);
+	alGenBuffers(NUM_STREAMING_BUFFERS, SoundEntries[sound_uid].bufferHandles);
 	memset(SoundEntries[sound_uid].bufferStatus, 0, sizeof(SoundEntries[sound_uid].bufferStatus)); //all ready to use
 	alSourcei(SoundEntries[sound_uid].handle, AL_BUFFER, 0); //ensure no buffer is bound
 
@@ -908,6 +908,11 @@ void llsOpenAL::SoundCleanup(int soundID)
 
 		alDeleteBuffers(NUM_STREAMING_BUFFERS, SoundEntries[soundID].bufferHandles);
 		ALErrorCheck("Destroying stream buffers");
+		SoundEntries[soundID].streaming = false;
+		for (i = 0; i < NUM_STREAMING_BUFFERS; i++)
+		{
+			SoundEntries[soundID].bufferStatus[i] = false;
+		}
 	}
 }
 
