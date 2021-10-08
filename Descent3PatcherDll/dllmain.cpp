@@ -130,6 +130,14 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
                 CreateJmpTo(GetPatchPoint(PatchPoint::RendFliprGLCall), (uintptr_t)&rGL_Flip);
             }
 
+            if (ConfigFogHint)
+            {
+                //Patch OpenGL fog hints to GL_NICEST
+                int newHint = 4354;
+                PatchMemory(GetPatchPoint(PatchPoint::OpenGLFogHint1), (uint8_t*)&newHint, sizeof(newHint));
+                PatchMemory(GetPatchPoint(PatchPoint::OpenGLFogHint2), (uint8_t*)&newHint, sizeof(newHint));
+            }
+
             //High FOV patch: This needs to patch both the FOV angle and the zoom value actually used for projection. 
             PutLogInit(LogLevel::Info, "Patching FOV constants.");
             //Patch Render_Fov variable

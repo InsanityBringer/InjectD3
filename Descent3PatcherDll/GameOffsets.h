@@ -93,6 +93,8 @@ enum class PatchPoint
 	OpenGLUploadData,
 	OpenGLTranslateTable,
 	OpenGLTranslate4444Table,
+	OpenGLFogHint1,
+	OpenGLFogHint2,
 
 	DGLBegin,
 	DGLBindTexture,

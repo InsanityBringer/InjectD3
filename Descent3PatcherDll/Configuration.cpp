@@ -35,6 +35,7 @@ bool PatchSoundSystem = true;
 
 bool ConfigForce32BitMode = true;
 bool ConfigForceZ32 = true;
+bool ConfigFogHint = true;
 int ConfigMultisampleCount = 1;
 
 int DisplayNum = 0;
@@ -72,7 +73,9 @@ ConfigEntry configList[] = {
 	{"NewSoundSystemReverbs", ConfigType::Boolean, &ConfigUseReverbs},
 	{"UseUserRegistry", ConfigType::Boolean, &PatchRegistryRoot},
 	{"MouseScalar", ConfigType::Float, &MouseScalar},
-	{"AlwaysKatmai", ConfigType::Boolean, &AlwaysKatmai} };
+	{"AlwaysKatmai", ConfigType::Boolean, &AlwaysKatmai},
+	{"PatchOpenGLFog", ConfigType::Boolean, &ConfigFogHint},
+};
 
 #define CONFIGLISTSIZE (sizeof(configList) / sizeof(*configList))
 

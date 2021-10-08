@@ -123,6 +123,8 @@ bool InitPatchPoints(GameVersion ver)
 		PatchMap[PatchPoint::OpenGLUploadData] = 0xf4012c;
 		PatchMap[PatchPoint::OpenGLTranslateTable] = 0xf40130;
 		PatchMap[PatchPoint::OpenGLTranslate4444Table] = 0xf40134;
+		PatchMap[PatchPoint::OpenGLFogHint1] = 0x53cc18 - 0x310;
+		PatchMap[PatchPoint::OpenGLFogHint2] = 0x53ccba - 0x310;
 
 		//opengl function pointers
 		//TODO: these can be dropped and my code can wglGetProcAddress things myself.
@@ -204,6 +206,8 @@ bool InitPatchPoints(GameVersion ver)
 		PatchMap[PatchPoint::OpenGLUploadData] = 0xf39394;
 		PatchMap[PatchPoint::OpenGLTranslateTable] = 0xf39398;
 		PatchMap[PatchPoint::OpenGLTranslate4444Table] = 0xf3939c;
+		PatchMap[PatchPoint::OpenGLFogHint1] = 0x53cc18;
+		PatchMap[PatchPoint::OpenGLFogHint2] = 0x53ccba;
 
 		//opengl function pointers
 		//TODO: these can be dropped and my code can wglGetProcAddress things myself.
