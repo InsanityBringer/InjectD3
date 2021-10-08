@@ -942,7 +942,7 @@ void llsOpenAL::ServiceStream(int soundID)
 	alGetSourcei(SoundEntries[soundID].handle, AL_BYTE_OFFSET, &position);
 	if (numQueuedBuffers < NUM_STREAMING_BUFFERS) //queue up a new one
 	{
-		int newSlot = 0;
+		int newSlot = -1;
 		int size = SoundEntries[soundID].info->m_stream_size;
 		void* data;
 		//Find first slot that's available
@@ -953,6 +953,12 @@ void llsOpenAL::ServiceStream(int soundID)
 				newSlot = i;
 				break;
 			}
+		}
+
+		if (newSlot == -1)
+		{
+			//eh, this needs to be reconsidered some. Can be race conditions here since the song is still playing before stuff is updated. 
+			return;
 		}
 
 		//Get available data and queue it
