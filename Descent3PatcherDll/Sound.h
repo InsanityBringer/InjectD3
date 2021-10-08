@@ -326,6 +326,8 @@ struct llsOpenALSoundEntry
 	bool playing;
 	//True if the source is streaming, since streaming sources need to be kept fed and also closed differently.
 	bool streaming;
+	//True if the source is streaming and ready to be terminated.
+	bool terminate;
 	play_information *info;
 
 	//Streaming buffer handles. These are the actual handles that will be queued.

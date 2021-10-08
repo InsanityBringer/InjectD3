@@ -167,7 +167,7 @@ int llsOpenAL::InitSoundLib(char mixer_type, oeWin32Application* sos, unsigned c
 			//Make the effect an EAX reverb
 			dalEffecti(EffectSlot, AL_EFFECT_TYPE, AL_EFFECT_EAXREVERB);
 			ALErrorCheck("Setting effect type");
-			SetGlobalReverbProperties(0.0, 0.0, 0.0);
+			SetGlobalReverbProperties(0.0, 0.0, 0.1);
 		}
 	}
 
@@ -316,6 +316,7 @@ int llsOpenAL::PlayStream(play_information* play_info)
 	NextUID++;
 	SoundEntries[sound_uid].playing = true;
 	SoundEntries[sound_uid].streaming = true;
+	SoundEntries[sound_uid].terminate = false;
 	SoundEntries[sound_uid].volume = peakVolume;
 	SoundEntries[sound_uid].info = play_info;
 	SoundEntries[sound_uid].soundUID = NextUID * 256 + sound_uid;
@@ -574,7 +575,7 @@ void llsOpenAL::SoundEndFrame(void)
 			//	ServiceStream(i);
 
 			alGetSourcei(SoundEntries[i].handle, AL_SOURCE_STATE, &state);
-			if (state == AL_STOPPED && !SoundEntries[i].streaming)
+			if (state == AL_STOPPED && (!SoundEntries[i].streaming || SoundEntries[i].terminate))
 			{
 				SoundCleanup(i);
 				//PutLog(LogLevel::Info, "Sound %d has been stopped", SoundEntries[i].soundUID);
@@ -893,7 +894,9 @@ void llsOpenAL::SoundCleanup(int soundID)
 		ALint numProcessedBuffers, numQueuedBuffers;
 		ALuint dequeueList[NUM_STREAMING_BUFFERS];
 		int i;
-		alGetSourcei(SoundEntries[soundID].handle, AL_BUFFERS_PROCESSED, &numProcessedBuffers);
+
+		alSourceStop(SoundEntries[soundID].handle); //ensure its actually stopped I guess
+		alGetSourcei(SoundEntries[soundID].handle, AL_BUFFERS_QUEUED, &numProcessedBuffers);
 		if (numProcessedBuffers > 0)
 		{
 			//back up current buffers in buffer queue
@@ -908,7 +911,7 @@ void llsOpenAL::SoundCleanup(int soundID)
 
 		alDeleteBuffers(NUM_STREAMING_BUFFERS, SoundEntries[soundID].bufferHandles);
 		ALErrorCheck("Destroying stream buffers");
-		SoundEntries[soundID].streaming = false;
+		SoundEntries[soundID].streaming = SoundEntries[soundID].terminate = false;
 		for (i = 0; i < NUM_STREAMING_BUFFERS; i++)
 		{
 			SoundEntries[soundID].bufferStatus[i] = false;
@@ -922,6 +925,10 @@ void llsOpenAL::ServiceStream(int soundID)
 	ALint position;
 	ALuint dequeueList[NUM_STREAMING_BUFFERS];
 	int i;
+
+	if (SoundEntries[soundID].terminate)
+		return;
+
 	alGetSourcei(SoundEntries[soundID].handle, AL_BUFFERS_PROCESSED, &numProcessedBuffers);
 	if (numProcessedBuffers > 0)
 	{
@@ -977,7 +984,7 @@ void llsOpenAL::ServiceStream(int soundID)
 			//PutLog(LogLevel::Error, "Tried to queue streaming buffer, but got nullptr.");
 			SoundEntries[soundID].info->m_stream_size = 0;
 			//When this occurs, the stream needs to terminate, the streaming service will then start a new stream. 
-			SoundCleanup(soundID);
+			SoundEntries[soundID].terminate = true;
 			return;
 		}
 
