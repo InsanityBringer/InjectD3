@@ -32,6 +32,7 @@
 int PatchScreenMode = SCREENMODE_WINDOWED;
 bool PatchMouseLibrary = true;
 bool PatchSoundSystem = true;
+bool PatchOpenGLSpecular = false;
 
 bool ConfigForce32BitMode = true;
 bool ConfigForceZ32 = true;
@@ -75,6 +76,7 @@ ConfigEntry configList[] = {
 	{"MouseScalar", ConfigType::Float, &MouseScalar},
 	{"AlwaysKatmai", ConfigType::Boolean, &AlwaysKatmai},
 	{"PatchOpenGLFog", ConfigType::Boolean, &ConfigFogHint},
+	{"OpenGLSpecular", ConfigType::Boolean, &PatchOpenGLSpecular},
 };
 
 #define CONFIGLISTSIZE (sizeof(configList) / sizeof(*configList))
@@ -159,7 +161,7 @@ void LoadConfig()
 		AutoUseSubBuffer = true;
 	}
 
-	if (PatchScreenMode || AutoUseSubBuffer)
+	if (PatchScreenMode || AutoUseSubBuffer || PatchOpenGLSpecular)
 	{
 		AutoPatchOpenGL = true;
 		if (!PatchScreenMode)

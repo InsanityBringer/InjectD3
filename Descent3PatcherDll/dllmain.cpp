@@ -185,6 +185,16 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
                 CreateCallTo(GetPatchPoint(PatchPoint::LLSConstructor), (uintptr_t)cppFuncPtr);
             }
 
+            if (PatchOpenGLSpecular)
+            {
+                PutLogInit(LogLevel::Info, "Patching OpenGL specular support.");
+                //Patch the OpenGL check out of UpdateSpecularFace
+                uint8_t notOpengl = 0xff;
+                PatchMemory(GetPatchPoint(PatchPoint::RendererSpecOpenGLCheck), &notOpengl, sizeof(notOpengl));
+                //Patch rend_SetAlphaType to support the Specular blending type
+                CreateCallTo(GetPatchPoint(PatchPoint::rGLSetAlphaTypeCall), (uintptr_t)&rGL_SetAlphaType);
+            }
+
             PutLogInit(LogLevel::Info, "Patching complete, game starting.");
         }
     }

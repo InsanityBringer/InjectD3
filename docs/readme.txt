@@ -92,6 +92,13 @@ Available patches:
 			InjectD3.cfg name: AlwaysKatmai
 			Valid values: 0 or 1.
 			
+		Enable OpenGL specular highlights: 
+			Enables specular highlights in OpenGL. This was deliberately disabled in the original game for some reason, but I
+			haven't noticed any serious issues enabling its support. 
+		
+			InjectD3.cfg name: OpenGLSpecular
+			Valid values: 0 or 1.
+			
 	Input patches:
 		New mouse library:
 			Enables new mouse code, using Windows's Raw Input APIs. Absolutely vital for windowed and borderless windowed modes

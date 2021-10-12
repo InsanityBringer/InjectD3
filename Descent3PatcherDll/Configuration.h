@@ -31,6 +31,7 @@ extern bool PatchMouseLibrary;
 extern bool PatchSoundSystem;
 extern bool PatchRegistryRoot;
 extern bool ConfigFogHint;
+extern bool PatchOpenGLSpecular;
 
 //Configuration switches
 extern bool ConfigForce32BitMode;

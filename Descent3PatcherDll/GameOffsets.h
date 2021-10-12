@@ -87,6 +87,7 @@ enum class PatchPoint
 	rGLInitCacheFunc,
 	rGLSetDefaultsFunc,
 	rGLInitMultitextureFunc,
+	rGLSetAlphaTypeCall,
 	OpenGLPackedUploadData,
 	OpenGLPackedTranslateTable,
 	OpenGLPackedTranslate4444Table,
@@ -95,6 +96,8 @@ enum class PatchPoint
 	OpenGLTranslate4444Table,
 	OpenGLFogHint1,
 	OpenGLFogHint2,
+	OpenGLAlphaMultiplier,
+	RendererSpecOpenGLCheck,
 
 	DGLBegin,
 	DGLBindTexture,

@@ -117,3 +117,30 @@ typedef struct
 
 int rGL_Init(oeWin32Application* app, renderer_preferred_state* pref_state);
 void rGL_Flip();
+void rGL_SetAlphaType(int8_t atype);
+
+// Alpha type flags - used to decide what type of alpha blending to use
+#define ATF_CONSTANT		1		// Take constant alpha into account
+#define ATF_TEXTURE		2		// Take texture alpha into account
+#define ATF_VERTEX		4		// Take vertex alpha into account
+
+// Alpha types
+#define	AT_ALWAYS				0				// Alpha is always 255 (1.0)					
+#define	AT_CONSTANT				1				// constant alpha across the whole image
+#define	AT_TEXTURE				2				// Only uses texture alpha
+#define	AT_CONSTANT_TEXTURE  3				// Use texture * constant alpha
+#define	AT_VERTEX				4				// Use vertex alpha only
+#define	AT_CONSTANT_VERTEX	5				// Use vertex * constant alpha
+#define	AT_TEXTURE_VERTEX		6				// Use texture * vertex alpha
+#define	AT_CONSTANT_TEXTURE_VERTEX	7		// Use all three (texture constant vertex)
+#define	AT_LIGHTMAP_BLEND		8				// dest*src colors
+#define  AT_SATURATE_TEXTURE	9				// Saturate up to white when blending
+#define  AT_FLAT_BLEND			10				// Like lightmap blend, but uses gouraud shaded flat polygon
+#define  AT_ANTIALIAS			11				// Draws an antialiased polygon
+#define  AT_SATURATE_VERTEX	12				// Saturation with vertices
+#define  AT_SATURATE_CONSTANT_VERTEX	13  // Constant*vertex saturation
+#define	AT_SATURATE_TEXTURE_VERTEX		14	// Texture * vertex saturation
+#define	AT_LIGHTMAP_BLEND_VERTEX		15	//	Like AT_LIGHTMAP_BLEND, but take vertex alpha into account
+#define	AT_LIGHTMAP_BLEND_CONSTANT		16	// Like AT_LIGHTMAP_BLEND, but take constant alpha into account
+#define	AT_SPECULAR							32	
+#define	AT_LIGHTMAP_BLEND_SATURATE		33	// Light lightmap blend, but add instead of multiply

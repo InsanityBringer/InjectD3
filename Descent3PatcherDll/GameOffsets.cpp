@@ -125,6 +125,9 @@ bool InitPatchPoints(GameVersion ver)
 		PatchMap[PatchPoint::OpenGLTranslate4444Table] = 0xf40134;
 		PatchMap[PatchPoint::OpenGLFogHint1] = 0x53cc18 - 0x310;
 		PatchMap[PatchPoint::OpenGLFogHint2] = 0x53ccba - 0x310;
+		PatchMap[PatchPoint::OpenGLAlphaMultiplier] = 0x5ac644 + 0x5FF8;
+		PatchMap[PatchPoint::rGLSetAlphaTypeCall] = 0x532eb4 - 784;
+		PatchMap[PatchPoint::RendererSpecOpenGLCheck] = 0x4c5468 - 0x400;
 
 		//opengl function pointers
 		//TODO: these can be dropped and my code can wglGetProcAddress things myself.
@@ -200,6 +203,7 @@ bool InitPatchPoints(GameVersion ver)
 		PatchMap[PatchPoint::rGLInitCacheFunc] = 0x53c9a0;
 		PatchMap[PatchPoint::rGLSetDefaultsFunc] = 0x53cad0;
 		PatchMap[PatchPoint::rGLInitMultitextureFunc] = 0x53c820;
+		PatchMap[PatchPoint::rGLSetAlphaTypeCall] = 0x532eb4;
 		PatchMap[PatchPoint::OpenGLPackedUploadData] = 0xf393a0;
 		PatchMap[PatchPoint::OpenGLPackedTranslateTable] = 0xf393a4;
 		PatchMap[PatchPoint::OpenGLPackedTranslate4444Table] = 0xf393a8;
@@ -208,6 +212,8 @@ bool InitPatchPoints(GameVersion ver)
 		PatchMap[PatchPoint::OpenGLTranslate4444Table] = 0xf3939c;
 		PatchMap[PatchPoint::OpenGLFogHint1] = 0x53cc18;
 		PatchMap[PatchPoint::OpenGLFogHint2] = 0x53ccba;
+		PatchMap[PatchPoint::OpenGLAlphaMultiplier] = 0x5ac644;
+		PatchMap[PatchPoint::RendererSpecOpenGLCheck] = 0x4c5468;
 
 		//opengl function pointers
 		//TODO: these can be dropped and my code can wglGetProcAddress things myself.

@@ -98,6 +98,11 @@ namespace InjectD3Configuration
         [Description("Forces the use of SEE features, even on non-Intel processors. This enables features like powerup sparkles.")]
         [DefaultValue(true)]
         public bool AlwaysKatmai { get; set; } = true;
+        [Category("Graphics")]
+        [DisplayName("Enable OpenGL specular highlights")]
+        [Description("Patches the specular mapping feature to work in OpenGL.")]
+        [DefaultValue(true)]
+        public bool OpenGLSpecular { get; set; } = true;
 
         public void ParseConfig(string filename)
         {
@@ -158,6 +163,9 @@ namespace InjectD3Configuration
                             case "AlwaysKatmai":
                                 AlwaysKatmai = int.Parse(parts[1]) != 0;
                                 break;
+                            case "OpenGLSpecular":
+                                OpenGLSpecular = int.Parse(parts[1]) != 0;
+                                break;
                         }
                     }
                 }
@@ -185,6 +193,7 @@ namespace InjectD3Configuration
             sw.WriteLine("FieldOfView={0}", DefaultFov.ToString("G", CultureInfo.InvariantCulture));
             sw.WriteLine("UseUserRegistry={0}", UseHKEYCurrentUser ? 1 : 0);
             sw.WriteLine("AlwaysKatmai={0}", AlwaysKatmai ? 1 : 0);
+            sw.WriteLine("OpenGLSpecular={0}", OpenGLSpecular ? 1 : 0);
 
             sw.Close();
             sw.Dispose();

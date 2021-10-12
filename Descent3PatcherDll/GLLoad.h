@@ -81,6 +81,7 @@ typedef GLenum(__stdcall* glGetError_fp)();
 typedef void(__stdcall* glTexCoord2f_fp)(GLfloat s, GLfloat t);
 typedef void (__stdcall* glBlitFramebuffer_fp) (GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter);
 typedef void (__stdcall* glTexImage2DMultisample_fp) (GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height, GLboolean fixedsamplelocations);
+typedef void (__stdcall* glBlendFuncSeparate_fp) (GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha);
 
 //Needed constants 
 #define GL_MULTISAMPLE                    0x809D
@@ -225,3 +226,4 @@ EXTERN(glGetError_fp, dglGetError);//glTexCoord2f_fp
 EXTERN(glTexCoord2f_fp, dglTexCoord2f);
 EXTERN(glBlitFramebuffer_fp, dglBlitFramebuffer);
 EXTERN(glTexImage2DMultisample_fp, dglTexImage2DMultisample);
+EXTERN(glBlendFuncSeparate_fp, dglBlendFuncSeparate);

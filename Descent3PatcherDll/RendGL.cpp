@@ -144,6 +144,7 @@ int rGL_Init(oeWin32Application* app, renderer_preferred_state* pref_state)
 		pOpenGL_packed_pixels = (int*)GetPatchPoint(PatchPoint::OpenGLPackedPixelsVar);
 		pOpenGL_multitexture = (int*)GetPatchPoint(PatchPoint::OpenGLMultitextureVar);
 		pWindowGL = (int*)GetPatchPoint(PatchPoint::WindowGLVar);
+		pAlpha_multiplier = (float*)GetPatchPoint(PatchPoint::OpenGLAlphaMultiplier);
 
 		pUseMultitexture = (bool*)GetPatchPoint(PatchPoint::UseMultitextureVar);
 
@@ -292,6 +293,8 @@ int rGL_Init(oeWin32Application* app, renderer_preferred_state* pref_state)
 	dglOrtho = *((glOrtho_fp*)GetPatchPoint(PatchPoint::DGLOrtho));
 	dglViewport = *((glViewport_fp*)GetPatchPoint(PatchPoint::DGLViewport));
 	dwglGetProcAddress = *((wglGetProcAddress_fp*)GetPatchPoint(PatchPoint::DWGLGetProcAddress)); //important, since borderless fullscreen needs more functions
+
+	dglBlendFuncSeparate = (glBlendFuncSeparate_fp)dwglGetProcAddress("glBlendFuncSeparate");
 
 	dglMatrixMode(GL_PROJECTION);
 	dglLoadIdentity();
@@ -542,4 +545,119 @@ void rGL_Flip()
 	{
 		SwapBuffers(*phOpenGLDC);
 	}
+}
+
+float rGL_GetAlphaMultiplier()
+{
+	switch (pOpenGL_state->cur_alpha_type)
+	{
+	case AT_ALWAYS:
+		return 1.0f;
+	case AT_CONSTANT:
+		return pOpenGL_state->cur_alpha / 255.0f;
+	case AT_TEXTURE:
+		return 1.0f;
+	case AT_CONSTANT_TEXTURE:
+		return pOpenGL_state->cur_alpha / 255.0f;
+	case AT_VERTEX:
+		return 1.0f;
+	case AT_CONSTANT_TEXTURE_VERTEX:
+	case AT_CONSTANT_VERTEX:
+		return pOpenGL_state->cur_alpha / 255.0f;
+	case AT_TEXTURE_VERTEX:
+		return 1.0f;
+	case AT_LIGHTMAP_BLEND:
+	case AT_LIGHTMAP_BLEND_SATURATE:
+		return pOpenGL_state->cur_alpha / 255.0f;
+	case AT_SATURATE_TEXTURE:
+		return pOpenGL_state->cur_alpha / 255.0f;
+	case AT_SATURATE_VERTEX:
+		return 1.0f;
+	case AT_SATURATE_CONSTANT_VERTEX:
+		return pOpenGL_state->cur_alpha / 255.0f;
+	case AT_SATURATE_TEXTURE_VERTEX:
+		return 1.0f;
+	case AT_SPECULAR:
+		return 1.0f;
+	default:
+		return 0;
+	}
+}
+
+// ======================
+// rGL_SetAlphaMultiplier
+// ======================
+//
+// Sets the alpha multiply factor
+void rGL_SetAlphaMultiplier()
+{
+	*pAlpha_multiplier = rGL_GetAlphaMultiplier();
+}
+
+// ====================
+// rGL_SetAlphaValue
+// ====================
+//
+// Sets the constant alpha value
+void rGL_SetAlphaValue(uint8_t val)
+{
+	pOpenGL_state->cur_alpha = val;
+	rGL_SetAlphaMultiplier();
+}
+
+void rGL_SetAlphaType(int8_t atype)
+{
+	if (atype == pOpenGL_state->cur_alpha_type)
+		return;		// don't set it redundantly
+
+	switch (atype)
+	{
+	case AT_ALWAYS:
+		rGL_SetAlphaValue(255);
+		glBlendFunc(GL_ONE, GL_ZERO);
+		break;
+	case AT_CONSTANT:
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		break;
+	case AT_TEXTURE:
+		rGL_SetAlphaValue(255);
+		glBlendFunc(GL_ONE, GL_ZERO);
+		break;
+	case AT_CONSTANT_TEXTURE:
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		break;
+	case AT_VERTEX:
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		break;
+	case AT_CONSTANT_TEXTURE_VERTEX:
+	case AT_CONSTANT_VERTEX:
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		break;
+	case AT_TEXTURE_VERTEX:
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		break;
+	case AT_LIGHTMAP_BLEND:
+		glBlendFunc(GL_DST_COLOR, GL_ZERO);
+		break;
+	case AT_SATURATE_TEXTURE:
+	case AT_LIGHTMAP_BLEND_SATURATE:
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+		break;
+	case AT_SATURATE_VERTEX:
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+		break;
+	case AT_SATURATE_CONSTANT_VERTEX:
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+		break;
+	case AT_SATURATE_TEXTURE_VERTEX:
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+		break;
+	case AT_SPECULAR:
+		glBlendFunc(GL_DST_COLOR, GL_ONE);
+		break;
+	default:
+		break;
+	}
+	pOpenGL_state->cur_alpha_type = atype;
+	rGL_SetAlphaMultiplier();
 }
