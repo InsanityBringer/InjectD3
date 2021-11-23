@@ -59,3 +59,4 @@ float ddio_MouseBtnDownTime(int btn);
 void ddio_MouseQueueFlush();
 void ddio_MouseReset();
 int ddio_MouseGetState(int* x, int* y, int* dx, int* dy, int* z, int* dz);
+void ddio_InternalMouseFrame();

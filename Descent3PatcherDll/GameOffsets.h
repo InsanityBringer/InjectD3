@@ -62,6 +62,7 @@ enum class PatchPoint
 	MouseBtnDownTimeThunk,
 	MouseResetThunk,
 	MouseGetStateThunk,
+	MouseFrameCall,
 
 	//variables
 	AppVar,

@@ -96,6 +96,7 @@ bool InitPatchPoints(GameVersion ver)
 		PatchMap[PatchPoint::MouseBtnDownTimeThunk] = 0x504fd0;
 		PatchMap[PatchPoint::MouseResetThunk] = 0x504cb0;
 		PatchMap[PatchPoint::MouseGetStateThunk] = 0x504ed0;
+		PatchMap[PatchPoint::MouseFrameCall] = 0x502b65;
 
 		//sound things
 		PatchMap[PatchPoint::SoundsVar] = 0xdfa8d8;
@@ -182,6 +183,7 @@ bool InitPatchPoints(GameVersion ver)
 		PatchMap[PatchPoint::MouseBtnDownTimeThunk] = 0x5052c0;
 		PatchMap[PatchPoint::MouseResetThunk] = 0x504fa0;
 		PatchMap[PatchPoint::MouseGetStateThunk] = 0x5051c0;
+		PatchMap[PatchPoint::MouseFrameCall] = 0x502f85;
 
 		//sound things
 		PatchMap[PatchPoint::SoundsVar] = 0xdf3b40;

@@ -225,6 +225,28 @@ int ddio_MouseGetState(int* x, int* y, int* dx, int* dy, int* z, int* dz)
 	return btn_mask;
 }
 
+void ddio_InternalMouseFrame()
+{
+	int btn_mask = 0;
+	static bool done = false;
+
+	if (!done)
+	{
+		PutLog(LogLevel::Info, "it work");
+		done = true;
+	}
+
+	if (pDIM_buttons->is_down[0]) btn_mask |= MOUSE_LB;
+	if (pDIM_buttons->is_down[1]) btn_mask |= MOUSE_RB;
+	if (pDIM_buttons->is_down[2]) btn_mask |= MOUSE_CB;
+	if (pDIM_buttons->is_down[3]) btn_mask |= MOUSE_B4;
+	if (pDIM_buttons->is_down[4]) btn_mask |= MOUSE_B5;
+	if (pDIM_buttons->is_down[5]) btn_mask |= MOUSE_B6;
+	if (pDIM_buttons->is_down[6]) btn_mask |= MOUSE_B7;
+	if (pDIM_buttons->is_down[7]) btn_mask |= MOUSE_B8;
+
+	pDDIO_mouse_state->btn_mask = btn_mask;
+}
 
 //-----------------------------------------------------------------------------
 // End Outrage-licensed code.

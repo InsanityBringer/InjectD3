@@ -45,6 +45,9 @@ LPALAUXILIARYEFFECTSLOTI dalAuxiliaryEffectSloti;
 
 char (*SoundLoadWaveFile)(char* filename, float percent_volume, int sound_file_index, bool f_high_quality, bool f_load_sample_data, int* e_type);
 
+//Hack: Maybe will fix problems with streaming system
+bool streamStartedthisFrame = false;
+
 llsSystem::llsSystem()
 {
 	m_geometry = nullptr;
@@ -323,6 +326,7 @@ int llsOpenAL::PlayStream(play_information* play_info)
 
 	NumSoundsPlaying++;
 	//PutLog(LogLevel::Info, "Starting stream with uid %d (slot %d). Format is %d. Buffer size is %d. Stream size is %d.", SoundEntries[sound_uid].soundUID, sound_uid, play_info->m_stream_format, play_info->m_stream_bufsize, play_info->m_stream_size);
+	streamStartedthisFrame = true;
 
 	return SoundEntries[sound_uid].soundUID;
 }
@@ -928,6 +932,12 @@ void llsOpenAL::ServiceStream(int soundID)
 
 	if (SoundEntries[soundID].terminate)
 		return;
+
+	if (streamStartedthisFrame)
+	{
+		streamStartedthisFrame = false;
+		return;
+	}
 
 	alGetSourcei(SoundEntries[soundID].handle, AL_BUFFERS_PROCESSED, &numProcessedBuffers);
 	if (numProcessedBuffers > 0)
