@@ -228,14 +228,8 @@ int ddio_MouseGetState(int* x, int* y, int* dx, int* dy, int* z, int* dz)
 void ddio_InternalMouseFrame()
 {
 	int btn_mask = 0;
-	static bool done = false;
 
-	if (!done)
-	{
-		PutLog(LogLevel::Info, "it work");
-		done = true;
-	}
-
+	//These need to be continually maintained, since a small number of inputs rely on it being set every frame.
 	if (pDIM_buttons->is_down[0]) btn_mask |= MOUSE_LB;
 	if (pDIM_buttons->is_down[1]) btn_mask |= MOUSE_RB;
 	if (pDIM_buttons->is_down[2]) btn_mask |= MOUSE_CB;
