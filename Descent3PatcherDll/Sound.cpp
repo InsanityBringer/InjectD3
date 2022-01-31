@@ -422,7 +422,7 @@ void llsOpenAL::AdjustSound(int sound_uid, pos_state* cur_pos, float adjusted_vo
 	alSource3f(handle, AL_POSITION, -cur_pos->position->x, cur_pos->position->y, cur_pos->position->z);
 	if (ALErrorCheck("Adjusting sound position."))
 		PutLog(LogLevel::Info, "\t(%f %f %f) (%f %f %f)", -cur_pos->velocity->x, cur_pos->velocity->y, cur_pos->velocity->z, -cur_pos->position->x, cur_pos->position->y, cur_pos->position->z);
-	alSourcef(handle, AL_GAIN, adjusted_volume * pSounds[SoundEntries[id].soundNum].import_volume);
+	alSourcef(handle, AL_GAIN, adjusted_volume);
 	ALErrorCheck("Adjusting sound gain.");
 }
 
@@ -762,7 +762,7 @@ void llsOpenAL::InitSource2D(uint32_t handle, sound_info* soundInfo, float volum
 	alSource3f(handle, AL_VELOCITY, 0.f, 0.f, 0.f);
 	alSource3f(handle, AL_POSITION, 0.f, 0.f, 0.f);
 	alSourcef(handle, AL_MAX_GAIN, 1.f);
-	alSourcef(handle, AL_GAIN, volume * soundInfo->import_volume);
+	alSourcef(handle, AL_GAIN, volume);
 	alSourcef(handle, AL_PITCH, 1.f);
 	alSourcef(handle, AL_DOPPLER_FACTOR, 0.f);
 
@@ -801,7 +801,7 @@ void llsOpenAL::InitSource3D(uint32_t handle, sound_info* soundInfo, pos_state* 
 	alSource3f(handle, AL_POSITION, -posInfo->position->x, posInfo->position->y, posInfo->position->z);
 	ALErrorCheck("Setting 3D sound source position.");
 	alSourcef(handle, AL_MAX_GAIN, 1.f);
-	alSourcef(handle, AL_GAIN, volume * soundInfo->import_volume);
+	alSourcef(handle, AL_GAIN, volume);
 	ALErrorCheck("Setting 3D sound source volume.");
 	alSourcef(handle, AL_PITCH, 1.f);
 	alSourcef(handle, AL_DOPPLER_FACTOR, 0.6f);
