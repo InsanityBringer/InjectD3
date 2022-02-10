@@ -54,6 +54,8 @@ enum class PatchPoint
 	ZoomInitLevel,
 	RegistryRoot,
 	KatmaiDisable,
+	UIFrameRateCheck,
+	UIFrameRateClamp,
 
 	//funcs
 	TimerGetTimeFunc,

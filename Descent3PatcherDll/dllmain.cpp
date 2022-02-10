@@ -39,6 +39,8 @@
 FILE* outputFile;
 
 bool PatchRegistryRoot = false;
+//This needs to remain in the heap since it's accessed via pointer
+double UIFrameTimeConstant = 0.05;
 
 void PatchMemory(uintptr_t address, uint8_t* data, size_t len);
 void CreateCallTo(uintptr_t srcAddress, uintptr_t funcAddress);
@@ -195,6 +197,15 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
                 PatchMemory(GetPatchPoint(PatchPoint::RendererSpecOpenGLCheck), &notOpengl, sizeof(notOpengl));
                 //Patch rend_SetAlphaType to support the Specular blending type
                 CreateCallTo(GetPatchPoint(PatchPoint::rGLSetAlphaTypeCall), (uintptr_t)&rGL_SetAlphaType);
+            }
+
+            if (UIFrameRate != 20)
+            {
+                PutLogInit(LogLevel::Info, "Patching UI framerate clamp.");
+                UIFrameTimeConstant = 1.0 / UIFrameRate;
+                double* frameTimePtr = &UIFrameTimeConstant;
+                PatchMemory(GetPatchPoint(PatchPoint::UIFrameRateCheck), (uint8_t*)&frameTimePtr, sizeof(frameTimePtr));
+                PatchMemory(GetPatchPoint(PatchPoint::UIFrameRateClamp), (uint8_t*)&frameTimePtr, sizeof(frameTimePtr));
             }
 
             PutLogInit(LogLevel::Info, "Patching complete, game starting.");

@@ -44,6 +44,7 @@ float DefaultFov = 72.0f;
 
 bool AutoPatchOpenGL = false;
 bool AutoUseSubBuffer = false;
+float UIFrameRate = 20.0f;
 
 bool AlwaysKatmai = false;
 
@@ -77,6 +78,7 @@ ConfigEntry configList[] = {
 	{"AlwaysKatmai", ConfigType::Boolean, &AlwaysKatmai},
 	{"PatchOpenGLFog", ConfigType::Boolean, &ConfigFogHint},
 	{"OpenGLSpecular", ConfigType::Boolean, &PatchOpenGLSpecular},
+	{"UIFrameRate", ConfigType::Float, &UIFrameRate},
 };
 
 #define CONFIGLISTSIZE (sizeof(configList) / sizeof(*configList))

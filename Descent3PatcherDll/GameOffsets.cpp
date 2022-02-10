@@ -86,6 +86,8 @@ bool InitPatchPoints(GameVersion ver)
 		PatchMap[PatchPoint::MemMallocSubFunc] = 0x564230;
 		PatchMap[PatchPoint::RegistryRoot] = 0x555009;
 		PatchMap[PatchPoint::KatmaiDisable] = 0x4f7830;
+		PatchMap[PatchPoint::UIFrameRateCheck] = 0x55fa5a;
+		PatchMap[PatchPoint::UIFrameRateClamp] = 0x55fa72;
 
 		//mouse things
 		PatchMap[PatchPoint::AppVar] = 0x63f15c;
@@ -173,6 +175,8 @@ bool InitPatchPoints(GameVersion ver)
 		PatchMap[PatchPoint::MemMallocSubFunc] = 0x564580;
 		PatchMap[PatchPoint::RegistryRoot] = 0x555319;
 		PatchMap[PatchPoint::KatmaiDisable] = 0x04f7c40;
+		PatchMap[PatchPoint::UIFrameRateCheck] = 0x55fd9a;
+		PatchMap[PatchPoint::UIFrameRateClamp] = 0x55fdb0;
 
 		//mouse things
 		PatchMap[PatchPoint::AppVar] = 0x6383c4;

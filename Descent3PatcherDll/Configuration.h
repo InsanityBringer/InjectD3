@@ -32,6 +32,7 @@ extern bool PatchSoundSystem;
 extern bool PatchRegistryRoot;
 extern bool ConfigFogHint;
 extern bool PatchOpenGLSpecular;
+extern float UIFrameRate;
 
 //Configuration switches
 extern bool ConfigForce32BitMode;
