@@ -201,6 +201,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
 
             if (UIFrameRate != 20)
             {
+                if (UIFrameRate < 20)
+                    UIFrameRate = 20;
                 PutLogInit(LogLevel::Info, "Patching UI framerate clamp.");
                 UIFrameTimeConstant = 1.0 / UIFrameRate;
                 double* frameTimePtr = &UIFrameTimeConstant;
