@@ -103,6 +103,11 @@ namespace InjectD3Configuration
         [Description("Patches the specular mapping feature to work in OpenGL.")]
         [DefaultValue(true)]
         public bool OpenGLSpecular { get; set; } = true;
+        [Category("Graphics")]
+        [DisplayName("UI Framerate")]
+        [Description("Sets the maximum framerate of the game's UI.")]
+        [DefaultValue(20f)]
+        public float UIFrameRate { get; set; } = 20f;
 
         public void ParseConfig(string filename)
         {
@@ -166,6 +171,9 @@ namespace InjectD3Configuration
                             case "OpenGLSpecular":
                                 OpenGLSpecular = int.Parse(parts[1]) != 0;
                                 break;
+                            case "UIFrameRate":
+                                UIFrameRate = float.Parse(parts[1], CultureInfo.InvariantCulture.NumberFormat);
+                                break;
                         }
                     }
                 }
@@ -194,6 +202,7 @@ namespace InjectD3Configuration
             sw.WriteLine("UseUserRegistry={0}", UseHKEYCurrentUser ? 1 : 0);
             sw.WriteLine("AlwaysKatmai={0}", AlwaysKatmai ? 1 : 0);
             sw.WriteLine("OpenGLSpecular={0}", OpenGLSpecular ? 1 : 0);
+            sw.WriteLine("UIFrameRate={0}", UIFrameRate.ToString("G", CultureInfo.InvariantCulture));
 
             sw.Close();
             sw.Dispose();

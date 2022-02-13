@@ -99,6 +99,13 @@ Available patches:
 			InjectD3.cfg name: OpenGLSpecular
 			Valid values: 0 or 1.
 			
+		UI Framerate:
+			The maximum framerate when a UI window is open. Defaults to 20. Increasing the framerate will also increase the
+			speed at which the mission selector dialog will open. 
+			
+			InjectD3.cfg name: UIFrameRate
+			Valid values: Anything 20 or above. 
+			
 	Input patches:
 		New mouse library:
 			Enables new mouse code, using Windows's Raw Input APIs. Absolutely vital for windowed and borderless windowed modes
