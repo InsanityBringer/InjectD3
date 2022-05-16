@@ -109,6 +109,12 @@ namespace InjectD3Configuration
         [DefaultValue(20f)]
         public float UIFrameRate { get; set; } = 20f;
 
+        [Category("Audio")]
+        [DisplayName("OpenAL doppler factor")]
+        [Description("Changes the doppler factor used by OpenAL. Higher values will result in greater pitch shifts while moving. Set to 0 to disable.")]
+        [DefaultValue(0.6f)]
+        public float DopplerFactor { get; set; } = 0.6f;
+
         public void ParseConfig(string filename)
         {
             StreamReader sr;
@@ -174,6 +180,9 @@ namespace InjectD3Configuration
                             case "UIFrameRate":
                                 UIFrameRate = float.Parse(parts[1], CultureInfo.InvariantCulture.NumberFormat);
                                 break;
+                            case "DopplerFactor":
+                                DopplerFactor = float.Parse(parts[1], CultureInfo.InvariantCulture.NumberFormat);
+                                break;
                         }
                     }
                 }
@@ -203,6 +212,7 @@ namespace InjectD3Configuration
             sw.WriteLine("AlwaysKatmai={0}", AlwaysKatmai ? 1 : 0);
             sw.WriteLine("OpenGLSpecular={0}", OpenGLSpecular ? 1 : 0);
             sw.WriteLine("UIFrameRate={0}", UIFrameRate.ToString("G", CultureInfo.InvariantCulture));
+            sw.WriteLine("DopplerFactor={0}", DopplerFactor.ToString("G", CultureInfo.InvariantCulture));
 
             sw.Close();
             sw.Dispose();

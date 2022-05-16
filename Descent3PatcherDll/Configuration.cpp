@@ -48,6 +48,8 @@ float UIFrameRate = 20.0f;
 
 bool AlwaysKatmai = false;
 
+extern float SoundDopplerMult;
+
 //TODO: Ugh, doesn't this feel relatively crusty and ancient?
 enum class ConfigType
 {
@@ -79,6 +81,7 @@ ConfigEntry configList[] = {
 	{"PatchOpenGLFog", ConfigType::Boolean, &ConfigFogHint},
 	{"OpenGLSpecular", ConfigType::Boolean, &PatchOpenGLSpecular},
 	{"UIFrameRate", ConfigType::Float, &UIFrameRate},
+	{"DopplerFactor", ConfigType::Float, &SoundDopplerMult},
 };
 
 #define CONFIGLISTSIZE (sizeof(configList) / sizeof(*configList))

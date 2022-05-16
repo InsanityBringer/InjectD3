@@ -48,6 +48,8 @@ char (*SoundLoadWaveFile)(char* filename, float percent_volume, int sound_file_i
 //Hack: Maybe will fix problems with streaming system
 bool streamStartedthisFrame = false;
 
+float SoundDopplerMult = 0.6f;
+
 llsSystem::llsSystem()
 {
 	m_geometry = nullptr;
@@ -804,7 +806,7 @@ void llsOpenAL::InitSource3D(uint32_t handle, sound_info* soundInfo, pos_state* 
 	alSourcef(handle, AL_GAIN, volume);
 	ALErrorCheck("Setting 3D sound source volume.");
 	alSourcef(handle, AL_PITCH, 1.f);
-	alSourcef(handle, AL_DOPPLER_FACTOR, 0.6f);
+	alSourcef(handle, AL_DOPPLER_FACTOR, SoundDopplerMult);
 
 	//PutLog(LogLevel::Info, "Starting 3d sound at %f %f %f", posInfo->position->x, posInfo->position->y, posInfo->position->z);
 
