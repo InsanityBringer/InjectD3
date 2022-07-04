@@ -295,6 +295,7 @@ int rGL_Init(oeWin32Application* app, renderer_preferred_state* pref_state)
 	dwglGetProcAddress = *((wglGetProcAddress_fp*)GetPatchPoint(PatchPoint::DWGLGetProcAddress)); //important, since borderless fullscreen needs more functions
 
 	dglBlendFuncSeparate = (glBlendFuncSeparate_fp)dwglGetProcAddress("glBlendFuncSeparate");
+	dglActiveTexture = (glActiveTexture_fp)dwglGetProcAddress("glActiveTexture");
 
 	dglMatrixMode(GL_PROJECTION);
 	dglLoadIdentity();
@@ -307,7 +308,6 @@ int rGL_Init(oeWin32Application* app, renderer_preferred_state* pref_state)
 	rGL_InitCache();
 
 	*pOpenGL_packed_pixels = rGL_CheckExtension((char*)"GL_EXT_packed_pixels");
-	//*pOpenGL_packed_pixels = 0;
 	*pOpenGL_multitexture = rGL_CheckExtension((char*)"GL_ARB_multitexture");
 	rGL_InitMultitexture();
 
@@ -389,7 +389,6 @@ int rGL_Init(oeWin32Application* app, renderer_preferred_state* pref_state)
 			b = (i & 0xf) / 16.0f * 255.0f;
 
 			//a = 0xf;
-
 			pix = (a << 24) | (b << 16) | (g << 8) | (r);
 
 			opengl_4444_translate_table[i] = pix;
@@ -605,10 +604,28 @@ void rGL_SetAlphaValue(uint8_t val)
 	rGL_SetAlphaMultiplier();
 }
 
+int gl_blend_state = 1;
+
 void rGL_SetAlphaType(int8_t atype)
 {
 	if (atype == pOpenGL_state->cur_alpha_type)
 		return;		// don't set it redundantly
+
+	if (atype == AT_ALWAYS)
+	{
+		if (gl_blend_state)
+		{
+			gl_blend_state = 0;
+			glDisable(GL_BLEND);
+			glDisable(GL_ALPHA_TEST);
+		}
+	}
+	else if (!gl_blend_state)
+	{
+		gl_blend_state = 1;
+		glEnable(GL_BLEND);
+		glEnable(GL_ALPHA_TEST);
+	}
 
 	switch (atype)
 	{
@@ -653,11 +670,21 @@ void rGL_SetAlphaType(int8_t atype)
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 		break;
 	case AT_SPECULAR:
-		glBlendFunc(GL_DST_COLOR, GL_ONE);
+		//glBlendFunc(GL_DST_COLOR, GL_ONE);
+		//glBlendFunc(GL_ONE, GL_ONE);
+		//rGL_SetAlphaValue(255);
+		//glBlendFunc(GL_ONE, GL_ZERO);
+		//glBlendFunc(GL_DST_ALPHA, GL_ONE);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+		glEnable(GL_TEXTURE_2D);
+		
+		pOpenGL_state->cur_texture_quality = 2;
+		pOpenGL_state->cur_texture_type = TT_PERSPECTIVE;
 		break;
 	default:
 		break;
 	}
+
 	pOpenGL_state->cur_alpha_type = atype;
 	rGL_SetAlphaMultiplier();
 }
