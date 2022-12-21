@@ -184,7 +184,7 @@ bool InitPatchPoints(GameVersion ver)
 		PatchMap[PatchPoint::RegistryRoot] = 0x555319;
 		PatchMap[PatchPoint::KatmaiDisable] = 0x04f7c40;
 		PatchMap[PatchPoint::UIFrameRateCheck] = 0x55fd9a;
-		PatchMap[PatchPoint::UIFrameRateClamp] = 0x55fdb0;
+		PatchMap[PatchPoint::UIFrameRateClamp] = 0x55fdb2;
 		PatchMap[PatchPoint::BitmapMakeResident] = 0x4fccf9;
 		PatchMap[PatchPoint::GameBitmaps] = 0xc456b0;
 		PatchMap[PatchPoint::GameLightmaps] = 0xca4e60;
