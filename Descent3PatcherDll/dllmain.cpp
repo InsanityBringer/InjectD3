@@ -35,6 +35,7 @@
 #include "Configuration.h"
 #include "Sound.h"
 #include "GameOffsets.h"
+#include "Bitmap.h"
 
 FILE* outputFile;
 
@@ -74,6 +75,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
             //Get some function pointers.
             timer_GetTime = (float(*)())GetPatchPoint(PatchPoint::TimerGetTimeFunc);
             mem_malloc_sub = (void* (*)(int, char*, int))GetPatchPoint(PatchPoint::MemMallocSubFunc);
+
+            InitBitmaps();
 
             //needs to be calculated after reading config
             double doubleFov = DefaultFov;
@@ -122,7 +125,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
                 PatchMemory(GetPatchPoint(PatchPoint::OeAppInitWindowParams), &windowedMode, sizeof(windowedMode));
             }
 
-            if (AutoPatchOpenGL)
+            if (AutoPatchOpenGL) //Okay, you know what, unconditionally patch OpenGL because this would be annoying otherwise.
             {
                 //OpenGL renderer patch:
                 PutLogInit(LogLevel::Info, "Patching OpenGL renderer.");
@@ -132,6 +135,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
                 CreateCallTo(GetPatchPoint(PatchPoint::RendSetModerGLInitCall), (uintptr_t)&rGL_Init);
                 //Patch rGL_Flip //5323c6
                 CreateJmpTo(GetPatchPoint(PatchPoint::RendFliprGLCall), (uintptr_t)&rGL_Flip);
+                //Thunk rGL_TranslateBitmapToOpenGL to patched version.
+                CreateJmpTo(GetPatchPoint(PatchPoint::OpenGLTranslateBitmapToOpenGL), (uintptr_t)&rGL_TranslateBitmapToOpenGL);
+                CreateJmpTo(GetPatchPoint(PatchPoint::OpenGLMakeTextureObject), (uintptr_t)&rGL_MakeTextureObject);
             }
 
             if (ConfigFogHint)

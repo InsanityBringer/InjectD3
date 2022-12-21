@@ -88,6 +88,9 @@ bool InitPatchPoints(GameVersion ver)
 		PatchMap[PatchPoint::KatmaiDisable] = 0x4f7830;
 		PatchMap[PatchPoint::UIFrameRateCheck] = 0x55fa5a;
 		PatchMap[PatchPoint::UIFrameRateClamp] = 0x55fa72;
+		PatchMap[PatchPoint::BitmapMakeResident] = 0x4fc8e9;
+		PatchMap[PatchPoint::GameBitmaps] = 0xc4c448;
+		PatchMap[PatchPoint::GameLightmaps] = 0xcabbf8;
 
 		//mouse things
 		PatchMap[PatchPoint::AppVar] = 0x63f15c;
@@ -120,6 +123,7 @@ bool InitPatchPoints(GameVersion ver)
 		PatchMap[PatchPoint::rGLInitCacheFunc] = 0x53c690;
 		PatchMap[PatchPoint::rGLSetDefaultsFunc] = 0x53c7c0;
 		PatchMap[PatchPoint::rGLInitMultitextureFunc] = 0x53c510;
+		PatchMap[PatchPoint::OpenGLLastBound] = 0xf3ed00;
 		PatchMap[PatchPoint::OpenGLPackedUploadData] = 0xf40138;
 		PatchMap[PatchPoint::OpenGLPackedTranslateTable] = 0xf4013c;
 		PatchMap[PatchPoint::OpenGLPackedTranslate4444Table] = 0xf40140;
@@ -131,6 +135,10 @@ bool InitPatchPoints(GameVersion ver)
 		PatchMap[PatchPoint::OpenGLAlphaMultiplier] = 0x5ac644 + 0x5FF8;
 		PatchMap[PatchPoint::rGLSetAlphaTypeCall] = 0x532eb4 - 784;
 		PatchMap[PatchPoint::RendererSpecOpenGLCheck] = 0x4c5468 - 0x400;
+		PatchMap[PatchPoint::OpenGLCurrentTextureObjectNum] = 0x5ac638 + 0x5FF8;
+		PatchMap[PatchPoint::OpenGLCurrentTextureUnitNum] = 0x5ac63c + 0x5FF8;
+		PatchMap[PatchPoint::OpenGLTranslateBitmapToOpenGL] = 0x53d240;
+		PatchMap[PatchPoint::OpenGLMakeTextureObject] = 0x53c5e0;
 
 		//opengl function pointers
 		//TODO: these can be dropped and my code can wglGetProcAddress things myself.
@@ -177,6 +185,9 @@ bool InitPatchPoints(GameVersion ver)
 		PatchMap[PatchPoint::KatmaiDisable] = 0x04f7c40;
 		PatchMap[PatchPoint::UIFrameRateCheck] = 0x55fd9a;
 		PatchMap[PatchPoint::UIFrameRateClamp] = 0x55fdb0;
+		PatchMap[PatchPoint::BitmapMakeResident] = 0x4fccf9;
+		PatchMap[PatchPoint::GameBitmaps] = 0xc456b0;
+		PatchMap[PatchPoint::GameLightmaps] = 0xca4e60;
 
 		//mouse things
 		PatchMap[PatchPoint::AppVar] = 0x6383c4;
@@ -210,6 +221,7 @@ bool InitPatchPoints(GameVersion ver)
 		PatchMap[PatchPoint::rGLSetDefaultsFunc] = 0x53cad0;
 		PatchMap[PatchPoint::rGLInitMultitextureFunc] = 0x53c820;
 		PatchMap[PatchPoint::rGLSetAlphaTypeCall] = 0x532eb4;
+		PatchMap[PatchPoint::OpenGLLastBound] = 0xf37f68;
 		PatchMap[PatchPoint::OpenGLPackedUploadData] = 0xf393a0;
 		PatchMap[PatchPoint::OpenGLPackedTranslateTable] = 0xf393a4;
 		PatchMap[PatchPoint::OpenGLPackedTranslate4444Table] = 0xf393a8;
@@ -220,6 +232,10 @@ bool InitPatchPoints(GameVersion ver)
 		PatchMap[PatchPoint::OpenGLFogHint2] = 0x53ccba;
 		PatchMap[PatchPoint::OpenGLAlphaMultiplier] = 0x5ac644;
 		PatchMap[PatchPoint::RendererSpecOpenGLCheck] = 0x4c5468;
+		PatchMap[PatchPoint::OpenGLCurrentTextureObjectNum] = 0x5ac638;
+		PatchMap[PatchPoint::OpenGLCurrentTextureUnitNum] = 0x5ac63c;
+		PatchMap[PatchPoint::OpenGLTranslateBitmapToOpenGL] = 0x53d550;
+		PatchMap[PatchPoint::OpenGLMakeTextureObject] = 0x53c8f0;
 
 		//opengl function pointers
 		//TODO: these can be dropped and my code can wglGetProcAddress things myself.

@@ -200,6 +200,12 @@ typedef void (__stdcall* glActiveTexture_fp) (GLenum texture);
 #define GL_TEXTURE30                      0x84DE
 #define GL_TEXTURE31                      0x84DF
 
+#define GL_UNSIGNED_BYTE_3_3_2_EXT        0x8032
+#define GL_UNSIGNED_SHORT_4_4_4_4_EXT     0x8033
+#define GL_UNSIGNED_SHORT_5_5_5_1_EXT     0x8034
+#define GL_UNSIGNED_INT_8_8_8_8_EXT       0x8035
+#define GL_UNSIGNED_INT_10_10_10_2_EXT    0x8036
+
 EXTERN(wglCreateContext_fp, dwglCreateContext);
 EXTERN(wglDeleteContext_fp, dwglDeleteContext);
 EXTERN(wglMakeCurrent_fp, dwglMakeCurrent);

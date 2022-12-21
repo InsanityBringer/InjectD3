@@ -160,6 +160,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Bitmap.h" />
     <ClInclude Include="Configuration.h" />
     <ClInclude Include="D3Defs.h" />
     <ClInclude Include="framework.h" />
@@ -175,6 +176,7 @@
     <ClInclude Include="Win32App.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Bitmap.cpp" />
     <ClCompile Include="Configuration.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="GameOffsets.cpp" />

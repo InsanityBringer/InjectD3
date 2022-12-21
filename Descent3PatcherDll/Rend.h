@@ -16,6 +16,11 @@
 #include <stdint.h>
 #include <gl/GL.h>
 
+#define MAP_TYPE_BITMAP			0
+#define MAP_TYPE_LIGHTMAP		1
+#define MAP_TYPE_BUMPMAP		2
+#define MAP_TYPE_UNKNOWN		3
+
 #define EXTERN(x,y) extern x y
 
  // lighting state
@@ -118,6 +123,8 @@ typedef struct
 int rGL_Init(oeWin32Application* app, renderer_preferred_state* pref_state);
 void rGL_Flip();
 void rGL_SetAlphaType(int8_t atype);
+void rGL_TranslateBitmapToOpenGL(int texnum, int bm_handle, int map_type, int replace, int tn); //Needed to add a thunk
+int rGL_MakeTextureObject(int tn); //Needed to thunk
 
 // Alpha type flags - used to decide what type of alpha blending to use
 #define ATF_CONSTANT		1		// Take constant alpha into account

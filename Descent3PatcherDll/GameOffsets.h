@@ -56,6 +56,9 @@ enum class PatchPoint
 	KatmaiDisable,
 	UIFrameRateCheck,
 	UIFrameRateClamp,
+	BitmapMakeResident,
+	GameBitmaps,
+	GameLightmaps,
 
 	//funcs
 	TimerGetTimeFunc,
@@ -91,6 +94,7 @@ enum class PatchPoint
 	rGLSetDefaultsFunc,
 	rGLInitMultitextureFunc,
 	rGLSetAlphaTypeCall,
+	OpenGLLastBound,
 	OpenGLPackedUploadData,
 	OpenGLPackedTranslateTable,
 	OpenGLPackedTranslate4444Table,
@@ -101,6 +105,10 @@ enum class PatchPoint
 	OpenGLFogHint2,
 	OpenGLAlphaMultiplier,
 	RendererSpecOpenGLCheck,
+	OpenGLCurrentTextureObjectNum,
+	OpenGLCurrentTextureUnitNum,
+	OpenGLTranslateBitmapToOpenGL,
+	OpenGLMakeTextureObject,
 
 	DGLBegin,
 	DGLBindTexture,

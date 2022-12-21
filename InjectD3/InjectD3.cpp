@@ -18,7 +18,7 @@ int main(int argc, char** argv)
 	PROCESS_INFORMATION pi = { 0 };
 	HANDLE hThread;
 	std::string str;
-	char lib_path[] = "Descent3PatcherDll.dll";
+	char lib_path[_MAX_PATH] = "Descent3PatcherDll.dll";
 	char exe_path[256] = "main.exe";
 
 	// Find alternate exe file (maybe Pyromania will work?)
@@ -29,6 +29,14 @@ int main(int argc, char** argv)
 			strncpy(exe_path, argv[i + 1], 255);
 			//Ensure null terminated
 			exe_path[255] = '\0';
+		}
+		
+		//This is for debugging purposes, to allow the debugger to mount the DLL I want. 
+		if (!strcmp("-dll", argv[i]) && i + 1 < argc)
+		{
+			strncpy(lib_path, argv[i + 1], _MAX_PATH - 1);
+			//Ensure null terminated
+			lib_path[_MAX_PATH - 1] = '\0';
 		}
 	}
 	// Execute the process in suspended mode.

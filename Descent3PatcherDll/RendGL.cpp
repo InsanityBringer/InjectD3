@@ -20,6 +20,7 @@
 #include "GrDefs.h"
 #include "Configuration.h"
 #include "GameOffsets.h"
+#include "Bitmap.h"
 
 #define MAINCODE
 #include "GLLoad.h"
@@ -34,6 +35,8 @@ float* pAlpha_multiplier;
 renderer_preferred_state* pOpenGL_preferred_state;
 HMODULE* pOpenGLDLLHandle;
 int* pAlready_loaded;
+int* pCur_texture_object_num;
+int* pCur_texture_unit_num;
 
 uint32_t* opengl_Upload_data = NULL;
 uint32_t* opengl_Translate_table = NULL;
@@ -49,9 +52,8 @@ uint8_t* OpenGL_lightmap_states;
 int* pOpenGL_sets_this_frame[10];
 int* pOpenGL_packed_pixels;
 int* pOpenGL_multitexture;
-int* pCur_texture_object_num;
 int* OpenGL_cache_initted;
-int* pOpenGL_last_bound[2];
+int* pOpenGL_last_bound;
 int* pWindowGL;
 
 bool* pUseMultitexture;
@@ -72,6 +74,16 @@ int (*rGL_CheckExtension)(char* extName);
 int (*rGL_InitCache)();
 void (*rGL_SetDefaults)();
 void (*rGL_InitMultitexture)();
+
+//Texture list
+GLuint texture_name_list[10000];
+
+/*void __stdcall glBindTextureShim(GLenum target, GLuint texture)
+{
+	if (texture >= 10000) return;
+
+	glBindTexture(target, texture_name_list[texture]);
+}*/
 
 //Hack state
 struct Monitor
@@ -134,9 +146,9 @@ int rGL_Init(oeWin32Application* app, renderer_preferred_state* pref_state)
 	int retval = 1;
 
 	//Load pointers
-	//1.4 offsets
 	if (!functionsLoaded)
 	{
+		pOpenGL_last_bound = (int*)GetPatchPoint(PatchPoint::OpenGLLastBound);
 		pOpenGL_preferred_state = (renderer_preferred_state*)GetPatchPoint(PatchPoint::OpenGLPreferredStateVar);
 		pOpenGL_state = (rendering_state*)GetPatchPoint(PatchPoint::OpenGLStateVar);
 		phOpenGLDC = (HDC*)GetPatchPoint(PatchPoint::OpenGLDCVar);
@@ -145,6 +157,8 @@ int rGL_Init(oeWin32Application* app, renderer_preferred_state* pref_state)
 		pOpenGL_multitexture = (int*)GetPatchPoint(PatchPoint::OpenGLMultitextureVar);
 		pWindowGL = (int*)GetPatchPoint(PatchPoint::WindowGLVar);
 		pAlpha_multiplier = (float*)GetPatchPoint(PatchPoint::OpenGLAlphaMultiplier);
+		pCur_texture_object_num = (int*)GetPatchPoint(PatchPoint::OpenGLCurrentTextureObjectNum);
+		pCur_texture_unit_num = (int*)GetPatchPoint(PatchPoint::OpenGLCurrentTextureUnitNum);
 
 		pUseMultitexture = (bool*)GetPatchPoint(PatchPoint::UseMultitextureVar);
 
@@ -294,6 +308,10 @@ int rGL_Init(oeWin32Application* app, renderer_preferred_state* pref_state)
 	dglViewport = *((glViewport_fp*)GetPatchPoint(PatchPoint::DGLViewport));
 	dwglGetProcAddress = *((wglGetProcAddress_fp*)GetPatchPoint(PatchPoint::DWGLGetProcAddress)); //important, since borderless fullscreen needs more functions
 
+	//Replace the version of glBindTexture that Descent 3 loaded with my shim
+	//glBindTexture_fp* pdglBindTexture = ((glBindTexture_fp*)GetPatchPoint(PatchPoint::DGLBindTexture));
+	//*pdglBindTexture = &glBindTextureShim;
+
 	dglBlendFuncSeparate = (glBlendFuncSeparate_fp)dwglGetProcAddress("glBlendFuncSeparate");
 	dglActiveTexture = (glActiveTexture_fp)dwglGetProcAddress("glActiveTexture");
 
@@ -305,10 +323,22 @@ int rGL_Init(oeWin32Application* app, renderer_preferred_state* pref_state)
 	dglLoadIdentity();
 
 	int i;
+	for (i = 0; i < 10000; i++)
+	{
+		texture_name_list[i] = 0;
+	}
 	rGL_InitCache();
 
 	*pOpenGL_packed_pixels = rGL_CheckExtension((char*)"GL_EXT_packed_pixels");
+	if (*pOpenGL_packed_pixels)
+		PutLog(LogLevel::Info, "Using GL_EXT_packed_pixels");
+	else
+		PutLog(LogLevel::Info, "GL_EXT_packed_pixels not found");
 	*pOpenGL_multitexture = rGL_CheckExtension((char*)"GL_ARB_multitexture");
+	if (*pOpenGL_multitexture)
+		PutLog(LogLevel::Info, "Using GL_ARB_multitexture");
+	else
+		PutLog(LogLevel::Info, "GL_ARB_multitexture not found");
 	rGL_InitMultitexture();
 
 	if (*pOpenGL_packed_pixels)
@@ -316,9 +346,9 @@ int rGL_Init(oeWin32Application* app, renderer_preferred_state* pref_state)
 		uint16_t** popengl_packed_Upload_data = (uint16_t**)GetPatchPoint(PatchPoint::OpenGLPackedUploadData);
 		uint16_t** popengl_packed_Translate_table = (uint16_t**)GetPatchPoint(PatchPoint::OpenGLPackedTranslateTable);
 		uint16_t** popengl_packed_4444_translate_table = (uint16_t**)GetPatchPoint(PatchPoint::OpenGLPackedTranslate4444Table);
-		opengl_packed_Upload_data = (uint16_t*)mem_malloc_sub(256 * 256 * 2, (char*)"dummy", 0);
-		opengl_packed_Translate_table = (uint16_t*)mem_malloc_sub(65536 * 2, (char*)"dummy", 0);
-		opengl_packed_4444_translate_table = (uint16_t*)mem_malloc_sub(65536 * 2, (char*)"dummy", 0);
+		opengl_packed_Upload_data = (uint16_t*)mem_malloc_sub(256 * 256 * 2, (char*)"opengl_packed_Upload_data", 0);
+		opengl_packed_Translate_table = (uint16_t*)mem_malloc_sub(65536 * 2, (char*)"opengl_packed_Translate_table", 0);
+		opengl_packed_4444_translate_table = (uint16_t*)mem_malloc_sub(65536 * 2, (char*)"opengl_packed_4444_translate_table", 0);
 
 		//mprintf((0, "Building packed OpenGL translate table...\n"));
 
@@ -356,12 +386,12 @@ int rGL_Init(oeWin32Application* app, renderer_preferred_state* pref_state)
 	}
 	else
 	{
-		uint32_t** popengl_Upload_data = (uint32_t**)0xf4012c;
-		uint32_t** popengl_Translate_table = (uint32_t**)0xf40130;
-		uint32_t** popengl_4444_translate_table = (uint32_t**)0xf40134;
-		opengl_Upload_data = (uint32_t*)mem_malloc_sub(256 * 256 * 4, (char*)"dummy", 0);
-		opengl_Translate_table = (uint32_t*)mem_malloc_sub(65536 * 4, (char*)"dummy", 0);
-		opengl_4444_translate_table = (uint32_t*)mem_malloc_sub(65536 * 4, (char*)"dummy", 0);
+		uint32_t** popengl_Upload_data = (uint32_t**)GetPatchPoint(PatchPoint::OpenGLUploadData);
+		uint32_t** popengl_Translate_table = (uint32_t**)GetPatchPoint(PatchPoint::OpenGLTranslateTable);
+		uint32_t** popengl_4444_translate_table = (uint32_t**)GetPatchPoint(PatchPoint::OpenGLTranslate4444Table);
+		opengl_Upload_data = (uint32_t*)mem_malloc_sub(256 * 256 * 4, (char*)"opengl_Upload_data", 0);
+		opengl_Translate_table = (uint32_t*)mem_malloc_sub(65536 * 4, (char*)"opengl_Translate_table", 0);
+		opengl_4444_translate_table = (uint32_t*)mem_malloc_sub(65536 * 4, (char*)"opengl_4444_translate_table", 0);
 
 		//mprintf((0, "Building OpenGL translate table...\n"));
 
@@ -687,4 +717,263 @@ void rGL_SetAlphaType(int8_t atype)
 
 	pOpenGL_state->cur_alpha_type = atype;
 	rGL_SetAlphaMultiplier();
+}
+
+#define GL_TEXTURE_MAX_LEVEL              0x813D
+
+int rGL_MakeTextureObject(int tn)
+{
+	int iVar1;
+
+	iVar1 = *pCur_texture_object_num;
+	*pCur_texture_object_num = *pCur_texture_object_num + 1;
+
+	//PutLog(LogLevel::Info, "Creating texture object for texture %d", iVar1);
+
+	if (texture_name_list[iVar1] == 0)
+	{
+		glGenTextures(1, &texture_name_list[iVar1]);
+		//PutLog(LogLevel::Info, "Generated GL texture %d", texture_name_list[iVar1]);
+	}
+
+	iVar1 = texture_name_list[iVar1];
+
+	if ((*pOpenGL_multitexture != 0) && (*pCur_texture_unit_num != tn)) 
+	{
+		dglActiveTexture(GL_TEXTURE0 + tn);
+		*pCur_texture_unit_num = tn;
+	}
+
+	glBindTexture(GL_TEXTURE_2D, iVar1);
+
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 2);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	return iVar1;
+}
+
+// Takes our 16bit format and converts it into the memory scheme that OpenGL wants
+void rGL_TranslateBitmapToOpenGL(int texnum, int bm_handle, int map_type, int replace, int tn)
+{
+	unsigned short* bm_ptr;
+
+	int w, h;
+	int size;
+
+	if (*pOpenGL_multitexture && *pCur_texture_unit_num != tn)
+	{
+		dglActiveTexture(GL_TEXTURE0 + tn);
+		*pCur_texture_unit_num = tn;
+	}
+
+	//PutLog(LogLevel::Info, "Uploading handle %d of type %d to texture slot %d", bm_handle, map_type, texnum);
+
+	if (map_type==MAP_TYPE_LIGHTMAP)
+	{
+		if (GameLightmaps[bm_handle].flags & LF_BRAND_NEW)
+			replace=0;
+
+		bm_ptr=lm_data (bm_handle);
+		GameLightmaps[bm_handle].flags &=~(LF_CHANGED|LF_BRAND_NEW);
+
+		w=lm_w(bm_handle);
+		h=lm_h(bm_handle);
+		size=GameLightmaps[bm_handle].square_res;
+	}
+	else
+	{
+		if (GameBitmaps[bm_handle].flags & BF_BRAND_NEW)
+			replace = 0;
+
+		bm_ptr = bm_data(bm_handle, 0);
+		GameBitmaps[bm_handle].flags &= ~(BF_CHANGED | BF_BRAND_NEW);
+		w = bm_w(bm_handle, 0);
+		h = bm_h(bm_handle, 0);
+		size = w;
+	}
+
+	if (pOpenGL_last_bound[tn] != texnum)
+	{
+		glBindTexture(GL_TEXTURE_2D, texnum);
+		//*pOpenGL_sets_this_frame[0] = *pOpenGL_sets_this_frame[0] + 1; //TODO: export maybe?
+		pOpenGL_last_bound[tn] = texnum;
+	}
+
+	int i;
+
+	if (*pOpenGL_packed_pixels)
+	{
+		if (map_type==MAP_TYPE_LIGHTMAP)
+		{
+			unsigned short *left_data=(unsigned short*)opengl_packed_Upload_data;
+			int bm_left=0;
+
+			for (int i=0;i<h;i++,left_data+=size,bm_left+=w)
+			{
+				unsigned short *dest_data=left_data;
+				for (int t=0;t<w;t++)
+				{
+					*dest_data++=opengl_packed_Translate_table[bm_ptr[bm_left+t]];
+				}
+			}
+
+			if (replace)
+			{
+				glTexSubImage2D (GL_TEXTURE_2D,0,0,0,size,size,GL_RGBA, GL_UNSIGNED_SHORT_5_5_5_1_EXT,opengl_packed_Upload_data);
+			}
+			else
+				glTexImage2D (GL_TEXTURE_2D,0,GL_RGB5_A1,size,size,0,GL_RGBA, GL_UNSIGNED_SHORT_5_5_5_1_EXT,opengl_packed_Upload_data);
+		}
+		else
+		{
+			int limit = 0;
+
+			if (bm_mipped(bm_handle))
+				limit = NUM_MIP_LEVELS + 3;
+			else
+				limit = 1;
+
+			//AMD bugfix: AMD's new OpenGL implementation requires complete textures, even in compatible contexts. 
+			//Set the limit of the texture's mipmap levels so it matches how many are present, since they don't go all the way down to 1x1
+			//Do note that the new implementation does not expose GL_EXT_packed_pixels so this won't be executed unless it is readded later. 
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, limit);
+
+			for (int m = 0; m < limit; m++)
+			{
+				if (m < NUM_MIP_LEVELS)
+				{
+					bm_ptr = bm_data(bm_handle, m);
+					w = bm_w(bm_handle, m);
+					h = bm_h(bm_handle, m);
+				}
+				else
+				{
+					bm_ptr = bm_data(bm_handle, NUM_MIP_LEVELS - 1);
+					w = bm_w(bm_handle, NUM_MIP_LEVELS - 1);
+					h = bm_h(bm_handle, NUM_MIP_LEVELS - 1);
+
+					w >>= m - (NUM_MIP_LEVELS - 1);
+					h >>= m - (NUM_MIP_LEVELS - 1);
+
+					if (w < 1)
+						continue;
+
+				}
+
+				if (bm_format(bm_handle) == BITMAP_FORMAT_4444)
+				{
+					// Do 4444
+
+					if (bm_mipped(bm_handle))
+					{
+						for (i = 0; i < w * h; i++)
+							opengl_packed_Upload_data[i] = /*0xf |*/ (opengl_packed_4444_translate_table[bm_ptr[i]]);
+					}
+					else
+					{
+						for (i = 0; i < w * h; i++)
+							opengl_packed_Upload_data[i] = opengl_packed_4444_translate_table[bm_ptr[i]];
+					}
+
+					if (replace)
+						glTexSubImage2D(GL_TEXTURE_2D, m, 0, 0, w, h, GL_RGBA, GL_UNSIGNED_SHORT_4_4_4_4_EXT, opengl_packed_Upload_data);
+					else
+						glTexImage2D(GL_TEXTURE_2D, m, GL_RGBA4, w, h, 0, GL_RGBA, GL_UNSIGNED_SHORT_4_4_4_4_EXT, opengl_packed_Upload_data);
+				}
+				else
+				{
+					// Do 1555
+					for (i = 0; i < w * h; i++)
+						opengl_packed_Upload_data[i] = opengl_packed_Translate_table[bm_ptr[i]];
+
+					if (replace)
+						glTexSubImage2D(GL_TEXTURE_2D, m, 0, 0, w, h, GL_RGBA, GL_UNSIGNED_SHORT_5_5_5_1_EXT, opengl_packed_Upload_data);
+					else
+						glTexImage2D(GL_TEXTURE_2D, m, GL_RGB5_A1, w, h, 0, GL_RGBA, GL_UNSIGNED_SHORT_5_5_5_1_EXT, opengl_packed_Upload_data);
+				}
+			}
+		}
+
+
+
+	}
+	else
+	{
+		if (map_type==MAP_TYPE_LIGHTMAP)
+		{
+			unsigned int *left_data=(unsigned int *)opengl_Upload_data;
+			int bm_left=0;
+
+			for (int i=0;i<h;i++,left_data+=size,bm_left+=w)
+			{
+				unsigned int *dest_data=left_data;
+				for (int t=0;t<w;t++)
+				{
+					*dest_data++=opengl_Translate_table[bm_ptr[bm_left+t]];
+				}
+			}
+
+			if (replace)
+				glTexSubImage2D (GL_TEXTURE_2D,0,0,0,size,size,GL_RGBA,GL_UNSIGNED_BYTE,opengl_Upload_data);
+			else
+				glTexImage2D (GL_TEXTURE_2D,0,GL_RGBA,size,size,0,GL_RGBA,GL_UNSIGNED_BYTE,opengl_Upload_data);
+		}
+		else
+		{
+			int limit = 0;
+
+			if (bm_mipped(bm_handle))
+				limit = NUM_MIP_LEVELS;
+			else
+				limit = 1;
+
+			//AMD bugfix: AMD's new OpenGL implementation requires complete textures, even in compatible contexts. 
+			//Set the limit of the texture's mipmap levels so it matches how many are present, since they don't go all the way down to 1x1
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, limit);
+
+			for (int m = 0; m < limit; m++)
+			{
+				bm_ptr = bm_data(bm_handle, m);
+				w = bm_w(bm_handle, m);
+				h = bm_h(bm_handle, m);
+
+				if (bm_format(bm_handle) == BITMAP_FORMAT_4444)
+				{
+					// Do 4444
+
+					if (bm_mipped(bm_handle))
+					{
+						for (i = 0; i < w * h; i++)
+							opengl_Upload_data[i] = /*(255 << 24) |*/ opengl_4444_translate_table[bm_ptr[i]];
+					}
+					else
+					{
+						for (i = 0; i < w * h; i++)
+							opengl_Upload_data[i] = opengl_4444_translate_table[bm_ptr[i]];
+					}
+				}
+				else
+				{
+					// Do 1555
+
+					for (i = 0; i < w * h; i++)
+						opengl_Upload_data[i] = opengl_Translate_table[bm_ptr[i]];
+				}
+
+				if (replace)
+					glTexSubImage2D(GL_TEXTURE_2D, m, 0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, opengl_Upload_data);
+				else
+					glTexImage2D(GL_TEXTURE_2D, m, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, opengl_Upload_data);
+
+			}
+		}
+	}
+
+	//mprintf ((1,"Doing slow upload to opengl!\n"));
+
+	if (map_type==MAP_TYPE_LIGHTMAP)
+		GameLightmaps[bm_handle].flags&=~LF_LIMITS;
+
 }
