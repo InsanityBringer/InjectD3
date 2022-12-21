@@ -76,6 +76,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
             //Get some function pointers.
             timer_GetTime = (float(*)())GetPatchPoint(PatchPoint::TimerGetTimeFunc);
             mem_malloc_sub = (void* (*)(int, char*, int))GetPatchPoint(PatchPoint::MemMallocSubFunc);
+            mem_free_sub = (void (*)(void*))GetPatchPoint(PatchPoint::MemFreeSubFunc);
 
             InitBitmaps();
 
@@ -126,7 +127,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
                 PatchMemory(GetPatchPoint(PatchPoint::OeAppInitWindowParams), &windowedMode, sizeof(windowedMode));
             }
 
-            if (AutoPatchOpenGL) //Okay, you know what, unconditionally patch OpenGL because this would be annoying otherwise.
+            //if (AutoPatchOpenGL) //Okay, you know what, unconditionally patch OpenGL because this would be annoying otherwise.
             {
                 //OpenGL renderer patch:
                 PutLogInit(LogLevel::Info, "Patching OpenGL renderer.");

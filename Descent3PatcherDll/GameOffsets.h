@@ -63,6 +63,7 @@ enum class PatchPoint
 	//funcs
 	TimerGetTimeFunc,
 	MemMallocSubFunc,
+	MemFreeSubFunc,
 	SoundLoadWaveFileFunc,
 	MouseBtnDownTimeThunk,
 	MouseResetThunk,

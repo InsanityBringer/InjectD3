@@ -84,6 +84,7 @@ bool InitPatchPoints(GameVersion ver)
 		PatchMap[PatchPoint::ZoomInitLevel] = 0x446b18;
 		PatchMap[PatchPoint::TimerGetTimeFunc] = 0x504900;
 		PatchMap[PatchPoint::MemMallocSubFunc] = 0x564230;
+		PatchMap[PatchPoint::MemFreeSubFunc] = 0x5642b0;
 		PatchMap[PatchPoint::RegistryRoot] = 0x555009;
 		PatchMap[PatchPoint::KatmaiDisable] = 0x4f7830;
 		PatchMap[PatchPoint::UIFrameRateCheck] = 0x55fa5a;
@@ -189,6 +190,7 @@ bool InitPatchPoints(GameVersion ver)
 		PatchMap[PatchPoint::ZoomInitLevel] = 0x446ad8;
 		PatchMap[PatchPoint::TimerGetTimeFunc] = 0x504bf0;
 		PatchMap[PatchPoint::MemMallocSubFunc] = 0x564580;
+		PatchMap[PatchPoint::MemFreeSubFunc] = 0x564600;
 		PatchMap[PatchPoint::RegistryRoot] = 0x555319;
 		PatchMap[PatchPoint::KatmaiDisable] = 0x04f7c40;
 		PatchMap[PatchPoint::UIFrameRateCheck] = 0x55fd9a;

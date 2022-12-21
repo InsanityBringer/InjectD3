@@ -14,3 +14,4 @@
 #pragma once
 
 extern void* (*mem_malloc_sub)(int size, char* file, int line);
+extern void (*mem_free_sub)(void* ptr);

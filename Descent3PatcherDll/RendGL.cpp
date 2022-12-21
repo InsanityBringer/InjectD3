@@ -75,6 +75,9 @@ int (*rGL_InitCache)();
 void (*rGL_SetDefaults)();
 void (*rGL_InitMultitexture)();
 
+//Size of the last allocation of the upload buffer. If an image would exceed this, allocate a new buffer and reset it
+size_t last_upload_buffer_size;
+
 //Texture list
 GLuint texture_name_list[10000];
 
@@ -349,6 +352,7 @@ int rGL_Init(oeWin32Application* app, renderer_preferred_state* pref_state)
 		opengl_packed_Upload_data = (uint16_t*)mem_malloc_sub(256 * 256 * 2, (char*)"opengl_packed_Upload_data", 0);
 		opengl_packed_Translate_table = (uint16_t*)mem_malloc_sub(65536 * 2, (char*)"opengl_packed_Translate_table", 0);
 		opengl_packed_4444_translate_table = (uint16_t*)mem_malloc_sub(65536 * 2, (char*)"opengl_packed_4444_translate_table", 0);
+		last_upload_buffer_size = 256 * 256 * 2;
 
 		//mprintf((0, "Building packed OpenGL translate table...\n"));
 
@@ -392,6 +396,7 @@ int rGL_Init(oeWin32Application* app, renderer_preferred_state* pref_state)
 		opengl_Upload_data = (uint32_t*)mem_malloc_sub(256 * 256 * 4, (char*)"opengl_Upload_data", 0);
 		opengl_Translate_table = (uint32_t*)mem_malloc_sub(65536 * 4, (char*)"opengl_Translate_table", 0);
 		opengl_4444_translate_table = (uint32_t*)mem_malloc_sub(65536 * 4, (char*)"opengl_4444_translate_table", 0);
+		last_upload_buffer_size = 256 * 256 * 4;
 
 		//mprintf((0, "Building OpenGL translate table...\n"));
 
@@ -810,6 +815,15 @@ void rGL_TranslateBitmapToOpenGL(int texnum, int bm_handle, int map_type, int re
 
 	if (*pOpenGL_packed_pixels)
 	{
+		if (w * h * 2 > last_upload_buffer_size)
+		{
+			mem_free_sub(opengl_packed_Upload_data);
+			uint16_t** popengl_packed_Upload_data = (uint16_t**)GetPatchPoint(PatchPoint::OpenGLPackedUploadData);
+			opengl_packed_Upload_data = (uint16_t*)mem_malloc_sub(w * h * 2, (char*)"opengl_packed_Upload_data", 0);
+			last_upload_buffer_size = w * h * 2;
+			*popengl_packed_Upload_data = opengl_packed_Upload_data;
+			PutLog(LogLevel::Info, "RendGL: Expanding upload buffer to %d", w * h * 2);
+		}
 		if (map_type==MAP_TYPE_LIGHTMAP)
 		{
 			unsigned short *left_data=(unsigned short*)opengl_packed_Upload_data;
@@ -906,6 +920,16 @@ void rGL_TranslateBitmapToOpenGL(int texnum, int bm_handle, int map_type, int re
 	}
 	else
 	{
+		if (w * h * 4 > last_upload_buffer_size)
+		{
+			mem_free_sub(opengl_Upload_data);
+			uint32_t** popengl_Upload_data = (uint32_t**)GetPatchPoint(PatchPoint::OpenGLUploadData);
+			opengl_Upload_data = (uint32_t*)mem_malloc_sub(w * h * 4, (char*)"opengl_Upload_data", 0);
+			last_upload_buffer_size = w * h * 4;
+			*popengl_Upload_data = opengl_Upload_data;
+			PutLog(LogLevel::Info, "RendGL: Expanding upload buffer to %d", w* h * 4);
+		}
+
 		if (map_type==MAP_TYPE_LIGHTMAP)
 		{
 			unsigned int *left_data=(unsigned int *)opengl_Upload_data;

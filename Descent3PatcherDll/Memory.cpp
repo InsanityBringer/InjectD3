@@ -14,3 +14,4 @@
 #include "Memory.h"
 
 void* (*mem_malloc_sub)(int size, char* file, int line);
+void (*mem_free_sub)(void* ptr);
