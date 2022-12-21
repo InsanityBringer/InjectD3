@@ -124,7 +124,16 @@ enum class PatchPoint
 	DGLLoadIdentity,
 	DGLOrtho,
 	DGLViewport,
-	DWGLGetProcAddress
+	DWGLGetProcAddress,
+
+	//Postrender patch
+	NumPostrenders,
+	IsPointVisible,
+	//Callsites for IsPointVisible that need to be patched
+	PostRenderRoomIPV1,
+	PostRenderRoomIPV2,
+	RenderAllTerrainObjectsIPV1,
+	RenderAllTerrainObjectsIPV2
 };
 
 GameVersion DetectVersion();

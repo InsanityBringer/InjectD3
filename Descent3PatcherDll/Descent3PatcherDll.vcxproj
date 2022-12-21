@@ -169,6 +169,7 @@
     <ClInclude Include="GrDefs.h" />
     <ClInclude Include="Memory.h" />
     <ClInclude Include="NewMouse.h" />
+    <ClInclude Include="Postrender.h" />
     <ClInclude Include="psclass.h" />
     <ClInclude Include="Rend.h" />
     <ClInclude Include="Sound.h" />
@@ -182,6 +183,7 @@
     <ClCompile Include="GameOffsets.cpp" />
     <ClCompile Include="Memory.cpp" />
     <ClCompile Include="NewMouse.cpp" />
+    <ClCompile Include="PostRender.cpp" />
     <ClCompile Include="RendGL.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="Win32App.cpp" />

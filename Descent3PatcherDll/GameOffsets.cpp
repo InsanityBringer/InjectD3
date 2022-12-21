@@ -158,6 +158,14 @@ bool InitPatchPoints(GameVersion ver)
 		PatchMap[PatchPoint::DGLViewport] = 0xf400f0;
 		PatchMap[PatchPoint::DWGLGetProcAddress] = 0xf40038;
 
+		//Postrender patch
+		PatchMap[PatchPoint::NumPostrenders] = 0x90a890;
+		PatchMap[PatchPoint::IsPointVisible] = 0x4cb8a0;
+		PatchMap[PatchPoint::PostRenderRoomIPV1] = 0x4c939b;
+		PatchMap[PatchPoint::PostRenderRoomIPV2] = 0x4c9425;
+		PatchMap[PatchPoint::RenderAllTerrainObjectsIPV1] = 0x4dff92;
+		PatchMap[PatchPoint::RenderAllTerrainObjectsIPV2] = 0x4e0101;
+
 		return true;
 
 		case GameVersion::Main_1_5_1794048:
@@ -254,6 +262,14 @@ bool InitPatchPoints(GameVersion ver)
 		PatchMap[PatchPoint::DGLOrtho] = 0xf3931c;
 		PatchMap[PatchPoint::DGLViewport] = 0xf39358;
 		PatchMap[PatchPoint::DWGLGetProcAddress] = 0xf392a0;
+
+		//Postrender patch
+		PatchMap[PatchPoint::NumPostrenders] = 0x903af8;
+		PatchMap[PatchPoint::IsPointVisible] = 0x4cbca0;
+		PatchMap[PatchPoint::PostRenderRoomIPV1] = 0x4c979b;
+		PatchMap[PatchPoint::PostRenderRoomIPV2] = 0x4c9825;
+		PatchMap[PatchPoint::RenderAllTerrainObjectsIPV1] = 0x4e0392;
+		PatchMap[PatchPoint::RenderAllTerrainObjectsIPV2] = 0x4e0501;
 
 		return true;
 	}

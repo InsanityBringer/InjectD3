@@ -36,6 +36,7 @@
 #include "Sound.h"
 #include "GameOffsets.h"
 #include "Bitmap.h"
+#include "Postrender.h"
 
 FILE* outputFile;
 
@@ -215,6 +216,13 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
                 PatchMemory(GetPatchPoint(PatchPoint::UIFrameRateCheck), (uint8_t*)&frameTimePtr, sizeof(frameTimePtr));
                 PatchMemory(GetPatchPoint(PatchPoint::UIFrameRateClamp), (uint8_t*)&frameTimePtr, sizeof(frameTimePtr));
             }
+
+            PutLogInit(LogLevel::Info, "Patching IsPointVisible calls.");
+            InitPostrenderPatch();
+            CreateCallTo(GetPatchPoint(PatchPoint::PostRenderRoomIPV1), (uintptr_t)&IsPointVisibleShim);
+            CreateCallTo(GetPatchPoint(PatchPoint::PostRenderRoomIPV2), (uintptr_t)&IsPointVisibleShim);
+            CreateCallTo(GetPatchPoint(PatchPoint::RenderAllTerrainObjectsIPV1), (uintptr_t)&IsPointVisibleShim);
+            CreateCallTo(GetPatchPoint(PatchPoint::RenderAllTerrainObjectsIPV2), (uintptr_t)&IsPointVisibleShim);
 
             PutLogInit(LogLevel::Info, "Patching complete, game starting.");
         }
