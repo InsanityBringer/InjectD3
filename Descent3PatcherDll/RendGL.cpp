@@ -843,7 +843,7 @@ void rGL_TranslateBitmapToOpenGL(int texnum, int bm_handle, int map_type, int re
 			//AMD bugfix: AMD's new OpenGL implementation requires complete textures, even in compatible contexts. 
 			//Set the limit of the texture's mipmap levels so it matches how many are present, since they don't go all the way down to 1x1
 			//Do note that the new implementation does not expose GL_EXT_packed_pixels so this won't be executed unless it is readded later. 
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, limit);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, limit-1);
 
 			for (int m = 0; m < limit; m++)
 			{
@@ -936,7 +936,7 @@ void rGL_TranslateBitmapToOpenGL(int texnum, int bm_handle, int map_type, int re
 
 			//AMD bugfix: AMD's new OpenGL implementation requires complete textures, even in compatible contexts. 
 			//Set the limit of the texture's mipmap levels so it matches how many are present, since they don't go all the way down to 1x1
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, limit);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, limit-1);
 
 			for (int m = 0; m < limit; m++)
 			{
