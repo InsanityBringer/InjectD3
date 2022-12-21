@@ -461,10 +461,14 @@ int rGL_Init(oeWin32Application* app, renderer_preferred_state* pref_state)
 			GLenum textureType = GL_TEXTURE_2D;
 			dglGenFramebuffers(1, &framebufferHandle);
 			dglGenFramebuffers(1, &subFramebufferHandle);
-			colorTextureHandle = 30000; //pick an arbritary high ID so Descent 3 doesn't overwrite it. Old OpenGL is fun.
+			/*colorTextureHandle = 30000; //pick an arbritary high ID so Descent 3 doesn't overwrite it. Old OpenGL is fun.
 			depthTextureHandle = 30001;
 			colorSubTextureHandle = 30002;
-			depthSubTextureHandle = 30003;
+			depthSubTextureHandle = 30003;*/
+			glGenTextures(1, &colorTextureHandle);
+			glGenTextures(1, &depthTextureHandle);
+			glGenTextures(1, &colorSubTextureHandle);
+			glGenTextures(1, &depthSubTextureHandle);
 
 			if (ConfigMultisampleCount > 1)
 			{
@@ -751,6 +755,7 @@ int rGL_MakeTextureObject(int tn)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1);
 	return iVar1;
 }
 
@@ -975,5 +980,4 @@ void rGL_TranslateBitmapToOpenGL(int texnum, int bm_handle, int map_type, int re
 
 	if (map_type==MAP_TYPE_LIGHTMAP)
 		GameLightmaps[bm_handle].flags&=~LF_LIMITS;
-
 }
