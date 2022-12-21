@@ -140,6 +140,16 @@ Available patches:
 			InjectD3.cfg name: NewSoundSystemReverbs
 			Valid values: 0, 1
 			
+	Additionally, the following patches are currently always applied:
+		Postrender overflow fix:
+			When too many particles are created, especially in levels with terrain, the "postrender" list can overflow and
+			corrupt memory, always leading to a crash. This is patched so that the limit is be enforced. This should
+			prevent crashes while fighting the Hellion, crashes fighting the ships in level 7, and so on.
+			
+		OpenGL fixes:
+			When using any of the new screen modes or multisampling, the game will apply patches to the OpenGL renderer.
+			This includes a fix for textures not working on AMD GPUs that are using the new AMD OpenGL implementation. 
+			
 Known bugs:
 
 	The following bugs are known and will be fixed in future versions, hopefully:
