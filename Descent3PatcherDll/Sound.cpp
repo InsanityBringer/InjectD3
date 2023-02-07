@@ -27,6 +27,7 @@
 #include "D3Defs.h"
 #include "Sound.h"
 #include "GameOffsets.h"
+#include "Win32App.h"
 
 //Configuration
 bool ConfigUseReverbs = false;
@@ -478,6 +479,8 @@ void llsOpenAL::StopSound(int sound_uid, unsigned char f_immediately)
 			alSourcei(SoundEntries[id].handle, AL_LOOPING, AL_FALSE);
 			alSourcePlay(SoundEntries[id].handle);
 			ALErrorCheck("Is it not okay to change AL_LOOPING on a playing source?");
+			//I don't know if Descent 3 holds onto the information at this point, so while servicing it I'm going to null it so the service code doesn't operate on it further.
+			SoundEntries[id].info = nullptr;
 
 			//PutLog(LogLevel::Info, "External code trying to stop sound %d (%s) from looping.", sound_uid, pSoundFiles[pSounds[SoundEntries[id].soundNum].sample_index].name);
 		}
@@ -560,7 +563,6 @@ void llsOpenAL::SoundStartFrame(void)
 		}
 	}
 }
-
 // End sound frame 
 void llsOpenAL::SoundEndFrame(void)
 {
@@ -586,9 +588,24 @@ void llsOpenAL::SoundEndFrame(void)
 				SoundCleanup(i);
 				//PutLog(LogLevel::Info, "Sound %d has been stopped", SoundEntries[i].soundUID);
 			}
-			else if (state == AL_PLAYING || SoundEntries[i].streaming)
+			else if (SoundEntries[i].info && (state == AL_PLAYING || SoundEntries[i].streaming))
 			{
-				SoundEntries[i].info->m_ticks++;
+				__try
+				{
+					SoundEntries[i].info->m_ticks++;
+				}
+				__except (GetExceptionCode() == EXCEPTION_ACCESS_VIOLATION)
+				{
+					PutLog(LogLevel::Error, "Error: Sound %d's information was invalid", i);
+					PutLog(LogLevel::Error, "\tSound UID is %d", SoundEntries[i].soundUID);
+					PutLog(LogLevel::Error, "\tReported channel count is %d", NumSoundChannels);
+					if (SoundEntries[i].streaming)
+						PutLog(LogLevel::Error, "\tSound is streaming");
+					else
+						PutLog(LogLevel::Error, "\tSound num is %d (%s)", SoundEntries[i].soundNum, pSounds[SoundEntries[i].soundNum].name);
+
+					MessageBox(app->m_hWnd, TEXT("Access violation in sound system, please show ISB InjectD3Output.txt"), TEXT("Sound system error"), MB_OK);
+				}
 			}
 		}
 	}

@@ -188,6 +188,7 @@ void OpenLog(const char* filename)
 
 	if (logfile)
 	{
+		setbuf(logfile, nullptr);
 		PutLogInit(LogLevel::Info, "Logging started successfully.");
 	}
 }
