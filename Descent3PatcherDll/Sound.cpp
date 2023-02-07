@@ -480,7 +480,7 @@ void llsOpenAL::StopSound(int sound_uid, unsigned char f_immediately)
 			alSourcePlay(SoundEntries[id].handle);
 			ALErrorCheck("Is it not okay to change AL_LOOPING on a playing source?");
 			//I don't know if Descent 3 holds onto the information at this point, so while servicing it I'm going to null it so the service code doesn't operate on it further.
-			SoundEntries[id].info = nullptr;
+			//SoundEntries[id].info = nullptr;
 
 			//PutLog(LogLevel::Info, "External code trying to stop sound %d (%s) from looping.", sound_uid, pSoundFiles[pSounds[SoundEntries[id].soundNum].sample_index].name);
 		}
