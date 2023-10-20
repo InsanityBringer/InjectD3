@@ -109,6 +109,14 @@ namespace InjectD3Configuration
                 if (res == DialogResult.Cancel)
                     e.Cancel = true;
             }
+
+            if (!e.Cancel)
+            {
+                //On close, always write out the registry even if changes weren't made.
+                //This is to ensure that the version key will always be written. 
+                Descent3RegistryConfig registryConfig = registry.GetConfig();
+                registry.SetConfig(registryConfig);
+            }
         }
 
         private void propertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)

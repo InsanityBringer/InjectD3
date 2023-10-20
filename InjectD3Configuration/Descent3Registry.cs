@@ -102,6 +102,20 @@ namespace InjectD3Configuration
             Descent3Key.SetValue("RS_vsync", config.RSVsync ? 1 : 0);
             Descent3Key.SetValue("SoundMixer", config.SoundMixer);
             Descent3Key.SetValue("CommandLine", config.CommandLine);
+
+            //Fix the "Unable to find version key for Descent 3" error some people were having by ensuring version keys always exist.
+            RegistryKey versionKey = Descent3Key.OpenSubKey("Version");
+            if (versionKey == null)
+            {
+                versionKey = Descent3Key.CreateSubKey("Version");
+                if (versionKey != null)
+                {
+                    versionKey.SetValue("Major", 1);
+                    versionKey.SetValue("Minor", 4);
+                    versionKey.SetValue("Build", 0);
+                    versionKey.Close();
+                }
+            }
         }
     }
 }
