@@ -588,7 +588,8 @@ void llsOpenAL::SoundEndFrame(void)
 				SoundCleanup(i);
 				//PutLog(LogLevel::Info, "Sound %d has been stopped", SoundEntries[i].soundUID);
 			}
-			else if (SoundEntries[i].info && (state == AL_PLAYING || SoundEntries[i].streaming))
+			//TODO: This isn't done in SoundEndFrame
+			/*else if (SoundEntries[i].info && (state == AL_PLAYING || SoundEntries[i].streaming))
 			{
 				__try
 				{
@@ -604,9 +605,9 @@ void llsOpenAL::SoundEndFrame(void)
 					else
 						PutLog(LogLevel::Error, "\tSound num is %d (%s)", SoundEntries[i].soundNum, pSounds[SoundEntries[i].soundNum].name);
 
-					MessageBox(app->m_hWnd, TEXT("Access violation in sound system, please show ISB InjectD3Output.txt"), TEXT("Sound system error"), MB_OK);
+					//MessageBox(app->m_hWnd, TEXT("Access violation in sound system, please show ISB InjectD3Output.txt"), TEXT("Sound system error"), MB_OK);
 				}
-			}
+			}*/
 		}
 	}
 }
