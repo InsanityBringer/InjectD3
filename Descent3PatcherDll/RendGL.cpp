@@ -25,6 +25,9 @@
 #define MAINCODE
 #include "GLLoad.h"
 
+typedef BOOL(__stdcall *wglSwapIntervalEXT_fp)(int interval);
+wglSwapIntervalEXT_fp dwglSwapIntervalEXT;
+
 //Pointers to original game OpenGL state
 HWND* phOpenGLWnd;
 HDC* phOpenGLDC;
@@ -547,6 +550,17 @@ int rGL_Init(oeWin32Application* app, renderer_preferred_state* pref_state)
 	}
 	pOpenGL_state->initted = 1;
 	PutLog(LogLevel::Info, "OpenGL library started successfully.");
+
+	dwglSwapIntervalEXT = (wglSwapIntervalEXT_fp)dwglGetProcAddress("wglSwapIntervalEXT");
+	if (dwglSwapIntervalEXT)
+	{
+		PutLog(LogLevel::Info, "WGL Swap interval supported.");
+		dwglSwapIntervalEXT(1);
+	}
+	else
+	{
+		PutLog(LogLevel::Info, "WGL Swap interval not supported. This is probably a bug.");
+	}
 
 	return retval;
 }
