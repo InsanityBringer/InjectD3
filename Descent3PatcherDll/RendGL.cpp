@@ -66,6 +66,8 @@ int screenWidth, screenHeight;
 //screen rectangle
 int screenOffsetX, screenOffsetY, screenOffsetW, screenOffsetH;
 
+int lastSwapInterval = -1;
+
 //Framebuffer nonsense
 GLuint framebufferHandle, colorTextureHandle, depthTextureHandle, colorSubTextureHandle, depthSubTextureHandle, subFramebufferHandle;
 
@@ -146,10 +148,30 @@ bool GLErrorCheck(const char* context)
 	return false;
 }
 
+//On call, pOpenGL_preferred_state must be a valid pointer. 
+//This will set the swap interval based on the preferred OpenGL state.
+void SetSwapInterval()
+{
+	if (!dwglSwapIntervalEXT)
+		return;
+
+	if (pOpenGL_preferred_state->vsync_on && lastSwapInterval != 1)
+	{
+		lastSwapInterval = 1;
+		dwglSwapIntervalEXT(lastSwapInterval);
+	}
+	else if (!pOpenGL_preferred_state->vsync_on && lastSwapInterval != 0)
+	{
+		lastSwapInterval = 0;
+		dwglSwapIntervalEXT(lastSwapInterval);
+	}
+}
+
 int rGL_Init(oeWin32Application* app, renderer_preferred_state* pref_state)
 {
 	int width, height;
 	int retval = 1;
+	lastSwapInterval = -1;
 
 	//Load pointers
 	if (!functionsLoaded)
@@ -553,21 +575,18 @@ int rGL_Init(oeWin32Application* app, renderer_preferred_state* pref_state)
 
 	dwglSwapIntervalEXT = (wglSwapIntervalEXT_fp)dwglGetProcAddress("wglSwapIntervalEXT");
 	if (dwglSwapIntervalEXT)
-	{
 		PutLog(LogLevel::Info, "WGL Swap interval supported.");
-		dwglSwapIntervalEXT(1);
-	}
 	else
-	{
 		PutLog(LogLevel::Info, "WGL Swap interval not supported. This is probably a bug.");
-	}
 
 	return retval;
 }
 
 void rGL_Flip()
 {
-	GLenum fbstatus;
+	//Ensure the swap interval is set to the user configured value. 
+	SetSwapInterval();
+
 	if (dglBindFramebuffer && AutoUseSubBuffer)
 	{
 		dglBindFramebuffer(GL_READ_FRAMEBUFFER, framebufferHandle);
