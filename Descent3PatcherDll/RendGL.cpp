@@ -108,6 +108,22 @@ void rGL_Close()
 {
 }*/
 
+void LogOpenGLInformation()
+{
+	static bool displayed = false;
+	if (!displayed)
+	{
+		PutLog(LogLevel::Info, "GL implementation information:");
+		const GLubyte* str = glGetString(GL_VENDOR);
+		PutLog(LogLevel::Info, "\tVendor: %s", str);
+		str = glGetString(GL_RENDERER);
+		PutLog(LogLevel::Info, "\tRenderer: %s", str);
+		str = glGetString(GL_VERSION);
+		PutLog(LogLevel::Info, "\tVersion: %s", str);
+		displayed = true;
+	}
+}
+
 BOOL Monitorenumproc(HMONITOR hMonitor, HDC hDC, LPRECT pRect, LPARAM lParam)
 {
 	Monitor monitor;
@@ -356,6 +372,7 @@ int rGL_Init(oeWin32Application* app, renderer_preferred_state* pref_state)
 		texture_name_list[i] = 0;
 	}
 	rGL_InitCache();
+	LogOpenGLInformation();
 
 	*pOpenGL_packed_pixels = rGL_CheckExtension((char*)"GL_EXT_packed_pixels");
 	if (*pOpenGL_packed_pixels)
